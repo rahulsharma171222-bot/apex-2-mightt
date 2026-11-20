@@ -364,9 +364,208 @@ export interface PublicBootstrapPayload {
   contentItems: AdminContentItem[];
   csrProposals: AdminCsrProposal[];
   siteGovernance: AdminSiteGovernance | null;
+  homepageSections?: HomepageSectionConfig[];
+  staticPages?: StaticPageRecord[];
+  missionConfigs?: MissionAdminConfig[];
+  wasteRecords?: WasteActivityRecord[];
+  wastePartners?: WastePartnerRecord[];
+  programmes?: UnifiedProgrammeRecord[];
+  founderMessage?: FounderMessageConfig;
 }
 
 export interface AdminMePayload {
   user: AdminProfile;
   allowedModules: AdminModuleKey[];
 }
+
+export interface HomepageSectionConfig {
+  id: string;
+  sectionKey: string;
+  label: string;
+  description: string;
+  enabled: boolean;
+  visible: boolean;
+  displayOrder: number;
+  headingEn: string;
+  headingHi: string;
+  subtitleEn: string;
+  subtitleHi: string;
+  ctaLabelEn: string;
+  ctaLabelHi: string;
+  ctaDestination: string;
+  imageUrl: string;
+  updatedAt?: string;
+}
+
+export interface StaticPageRecord {
+  id: string;
+  titleEn: string;
+  titleHi: string;
+  slug: string;
+  parentPath: string;
+  summaryEn: string;
+  summaryHi: string;
+  bodyEn: string;
+  bodyHi: string;
+  linkedFormType: string;
+  ctaLabel: string;
+  seoTitle: string;
+  seoDescription: string;
+  showInNav: boolean;
+  navOrder: number;
+  status: 'Draft' | 'Published' | 'Hidden';
+  updatedAt?: string;
+}
+
+export interface MissionAdminConfig {
+  slug: string;
+  number: number;
+  titleEn: string;
+  titleHi: string;
+  introEn: string;
+  introHi: string;
+  subsections: string[];
+  proposedActivities: string[];
+  linkedFormType: string;
+  status: 'Draft' | 'Published' | 'Hidden';
+  seoTitle: string;
+  seoDescription: string;
+  faqs: { q: string; a: string }[];
+  updatedAt?: string;
+}
+
+export interface WasteActivityRecord {
+  id: string;
+  title: string;
+  campaignOrProject: string;
+  stateName: string;
+  district: string;
+  locationName: string;
+  activityDate: string;
+  category:
+    | 'Wet Waste'
+    | 'Dry Plastic'
+    | 'Sanitary Waste'
+    | 'Special-Care Waste'
+    | 'Temple Organic Waste';
+  quantity: number;
+  unit: 'kg' | 'tonnes';
+  householdsCount: number;
+  participantsCount: number;
+  collectionPartner: string;
+  recyclingDestination: string;
+  evidenceNote: string;
+  verificationStatus: 'Submitted' | 'Verified' | 'Published';
+  isPublic: boolean;
+  updatedAt?: string;
+}
+
+export interface WastePartnerRecord {
+  id: string;
+  name: string;
+  partnerType:
+    | 'Authorised Recycler'
+    | 'Collection Agency'
+    | 'SHG Cloth Bag Unit'
+    | 'Compost & Biogas Unit';
+  district: string;
+  contactPerson: string;
+  status: 'Active' | 'Pending Verification';
+  notes: string;
+}
+
+export type ProgrammeType = 'project' | 'campaign' | 'event' | 'training';
+
+export type ProgrammePublicationStatus = 'Draft' | 'Review' | 'Published' | 'Archived';
+
+export type ProgrammeOperationalStatus =
+  | 'Planned'
+  | 'In Progress'
+  | 'Completed'
+  | 'Proposed'
+  | 'Under Assessment'
+  | 'Approved'
+  | 'Ongoing'
+  | 'Completed / Verified';
+
+export type ProgrammeLocationLevel =
+  | 'Entire District'
+  | 'Tehsil / Block'
+  | 'Village / Gram Panchayat'
+  | 'City / Municipality / Ward';
+
+export interface ProgrammeLocationTag {
+  id: string;
+  stateName: string;
+  district: string;
+  locationLevel: ProgrammeLocationLevel;
+  localityName: string; // e.g., Mandalgarh Block, Gram Panchayat A, Ward 4
+}
+
+export interface ProgrammeMediaItem {
+  id: string;
+  mediaType: 'photo' | 'video' | 'pdf';
+  url: string;
+  title: string;
+  caption: string;
+  altText: string;
+  capturedDate: string;
+  locationLabel: string;
+  isCover: boolean;
+  isPublic: boolean;
+  displayOrder: number;
+}
+
+export interface UnifiedProgrammeRecord {
+  id: string;
+  programmeCode: string;
+  type: ProgrammeType;
+  parentId: string | null; // Project -> Campaign -> Event / Training hierarchy
+  titleEn: string;
+  titleHi: string;
+  summaryEn: string;
+  summaryHi: string;
+  objectivesEn: string;
+  objectivesHi: string;
+  coverageScope: 'specific' | 'india-wide';
+  locations: ProgrammeLocationTag[];
+  missionSlug: string;
+  missionSlugs?: string[];
+  linkedFormType: string;
+  linkedFormTypes?: string[];
+  publicationStatus: ProgrammePublicationStatus;
+  operationalStatus: ProgrammeOperationalStatus;
+  startDate: string;
+  endDate: string;
+  venueOrMode: string; // Event venue / Training mode (Online, Field, Hybrid)
+  targetAudience: string; // Farmers, Youth, SHG, Schools, etc.
+  seoTitle: string;
+  seoDescription: string;
+  media: ProgrammeMediaItem[];
+  roles: CampaignRoleSpec[];
+  updatedAt?: string;
+}
+
+export interface FounderMessageConfig {
+  headingEn: string;
+  headingHi: string;
+  messageEn: string;
+  messageHi: string;
+  attributionEn: string;
+  attributionHi: string;
+  signatureImageUrl: string;
+  showOnAboutUs: boolean;
+  updatedAt?: string;
+}
+
+export interface AdminBlueprintPayload {
+  homepageSections: HomepageSectionConfig[];
+  staticPages: StaticPageRecord[];
+  missionConfigs: MissionAdminConfig[];
+  wasteRecords: WasteActivityRecord[];
+  wastePartners: WastePartnerRecord[];
+  programmes: UnifiedProgrammeRecord[];
+  founderMessage?: FounderMessageConfig;
+}
+
+

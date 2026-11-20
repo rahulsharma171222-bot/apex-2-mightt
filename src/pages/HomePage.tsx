@@ -239,10 +239,51 @@ export function HomePage({ lang, onNavigate }: HomePageProps) {
   );
   const publishedMetrics = (bootstrap?.impactMetrics ?? []).filter((m) => m.isPublished);
 
+  // Live Admin Homepage & Sections CMS controls (visibility, ordering, bilingual headings & CTAs)
+  const cmsSections = bootstrap?.homepageSections ?? [];
+  const cmsSectionMap = new Map(cmsSections.map((s) => [s.sectionKey, s]));
+  const isSectionVisible = (key: string): boolean => {
+    const cfg = cmsSectionMap.get(key);
+    return !cfg || (cfg.enabled && cfg.visible);
+  };
+  const getSectionOrder = (key: string, fallback: number): number => {
+    const cfg = cmsSectionMap.get(key);
+    return cfg ? cfg.displayOrder : fallback;
+  };
+  const getSectionText = (
+    key: string,
+    field: 'heading' | 'subtitle' | 'ctaLabel',
+    fallback: string
+  ): string => {
+    const cfg = cmsSectionMap.get(key);
+    if (!cfg) return fallback;
+    const raw =
+      field === 'heading'
+        ? lang === 'hi'
+          ? cfg.headingHi || cfg.headingEn
+          : cfg.headingEn || cfg.headingHi
+        : field === 'subtitle'
+        ? lang === 'hi'
+          ? cfg.subtitleHi || cfg.subtitleEn
+          : cfg.subtitleEn || cfg.subtitleHi
+        : lang === 'hi'
+        ? cfg.ctaLabelHi || cfg.ctaLabelEn
+        : cfg.ctaLabelEn || cfg.ctaLabelHi;
+    return raw?.trim() || fallback;
+  };
+  const getSectionCtaDest = (key: string, fallback: string): string => {
+    const dest = cmsSectionMap.get(key)?.ctaDestination?.trim();
+    return dest || fallback;
+  };
+
   return (
-    <div className="bg-white">
+    <div className="bg-white flex flex-col">
       {/* SECTION 2: REAL INTERACTIVE HERO SECTION — DESKTOP PANORAMA + MOBILE VISUAL-TOP FULL-SCREEN */}
-      <section className="relative bg-white overflow-hidden">
+      {isSectionVisible('hero') && (
+      <section
+        style={{ order: getSectionOrder('hero', 1) }}
+        className="relative bg-white overflow-hidden"
+      >
         <div className="max-w-[1600px] mx-auto">
           {/* MOBILE (< md): CREATIVE UNIFIED FULL-CANOPY TREE + SVG RAJASTHAN HORIZON + FROSTED TYPOGRAPHY AMALGAMATION */}
           <div className="md:hidden relative flex flex-col bg-gradient-to-b from-[#F2F9EF] via-white to-white overflow-hidden">
@@ -565,36 +606,67 @@ export function HomePage({ lang, onNavigate }: HomePageProps) {
           </div>
         </div>
       </section>
+      )}
 
       {/* SECTION 4: WHO WE ARE — EDITORIAL SANDSTONE SHOWCASE + 10-MISSION RADIAL WHEEL + BLENDED FORT HORIZON */}
-      <WhoWeAreShowcase lang={lang} onNavigate={onNavigate} />
+      {isSectionVisible('about') && (
+        <div style={{ order: getSectionOrder('about', 2) }}>
+          <WhoWeAreShowcase lang={lang} onNavigate={onNavigate} />
+        </div>
+      )}
 
       {/* SECTION 4.5: WHY IT MATTERS / क्यों ज़रूरी है यह मिशन? */}
-      <WhyItMattersShowcase lang={lang} onNavigate={onNavigate} />
+      {isSectionVisible('about') && (
+        <div style={{ order: getSectionOrder('about', 2) }}>
+          <WhyItMattersShowcase lang={lang} onNavigate={onNavigate} />
+        </div>
+      )}
 
       {/* SECTION 5: OUR 10 MISSIONS / हमारे 10 प्रमुख मिशन */}
-      <OurTenMissionsShowcase lang={lang} onNavigate={onNavigate} />
+      {isSectionVisible('missions') && (
+        <div style={{ order: getSectionOrder('missions', 3) }}>
+          <OurTenMissionsShowcase lang={lang} onNavigate={onNavigate} />
+        </div>
+      )}
 
       {/* SECTION 6: HARIT RAJASTHAN CAMPAIGN + INTERACTIVE MAP & 5 FOCUS DISTRICTS */}
-      <section className="py-14 lg:py-20 bg-white px-4 sm:px-6 lg:px-8">
+      {isSectionVisible('harit_rajasthan') && (
+      <section
+        style={{ order: getSectionOrder('harit_rajasthan', 4) }}
+        className="py-14 lg:py-20 bg-white px-4 sm:px-6 lg:px-8"
+      >
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 mb-10">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wider text-[#388E3C]">
-                {lang === 'hi' ? 'GOVEDA की क्षेत्रीय हरित पहल' : "GOVEDA's Regional Green Initiative"}
+                {getSectionText(
+                  'harit_rajasthan',
+                  'subtitle',
+                  lang === 'hi' ? 'GOVEDA की क्षेत्रीय हरित पहल' : "GOVEDA's Regional Green Initiative"
+                )}
               </p>
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#144527] mt-1">
-                {lang === 'hi'
-                  ? 'हरित राजस्थान — गाँव-गाँव से हरित क्रांति'
-                  : 'Harit Rajasthan — Building a Greener Rajasthan, Village by Village'}
+                {getSectionText(
+                  'harit_rajasthan',
+                  'heading',
+                  lang === 'hi'
+                    ? 'हरित राजस्थान — गाँव-गाँव से हरित क्रांति'
+                    : 'Harit Rajasthan — Building a Greener Rajasthan, Village by Village'
+                )}
               </h2>
             </div>
             <SpringButton
               variant="primary"
               size="md"
-              onClick={() => onNavigate('/harit-rajasthan')}
+              onClick={() => onNavigate(getSectionCtaDest('harit_rajasthan', '/harit-rajasthan'))}
             >
-              <span>{lang === 'hi' ? 'हरित राजस्थान पेज देखें' : 'Open Harit Rajasthan Page'}</span>
+              <span>
+                {getSectionText(
+                  'harit_rajasthan',
+                  'ctaLabel',
+                  lang === 'hi' ? 'हरित राजस्थान पेज देखें' : 'Open Harit Rajasthan Page'
+                )}
+              </span>
               <ArrowRight className="w-4 h-4" />
             </SpringButton>
           </div>
@@ -674,9 +746,14 @@ export function HomePage({ lang, onNavigate }: HomePageProps) {
           </div>
         </div>
       </section>
+      )}
 
       {/* SECTION 7: CARBON CREDIT SIMPLE EXPLANATION */}
-      <section className="py-14 lg:py-20 bg-[#F3F8F2] px-4 sm:px-6 lg:px-8 border-y border-[#388E3C]/15">
+      {isSectionVisible('projects') && (
+      <section
+        style={{ order: getSectionOrder('projects', 5) }}
+        className="py-14 lg:py-20 bg-[#F3F8F2] px-4 sm:px-6 lg:px-8 border-y border-[#388E3C]/15"
+      >
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             <div className="lg:col-span-5 space-y-4">
@@ -775,9 +852,14 @@ export function HomePage({ lang, onNavigate }: HomePageProps) {
           </div>
         </div>
       </section>
+      )}
 
       {/* SECTION 8 & 9: GAUSHALA, BIOGAS & ORGANIC FARMING WITH SEAMLESS PHOTO CANVASES */}
-      <section className="py-14 lg:py-20 bg-white px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      {isSectionVisible('projects') && (
+      <section
+        style={{ order: getSectionOrder('projects', 6) }}
+        className="py-14 lg:py-20 bg-white px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto"
+      >
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <SeamlessPhotoCanvas
             assetKey="gaushalaBiogas"
@@ -854,11 +936,18 @@ export function HomePage({ lang, onNavigate }: HomePageProps) {
           />
         </div>
       </section>
+      )}
 
-      <ScenicHorizonStrip variant="fort" />
+      <div style={{ order: getSectionOrder('projects', 6) }}>
+        <ScenicHorizonStrip variant="fort" />
+      </div>
 
       {/* SECTION 10 & 11: SKILL DEVELOPMENT, FOREIGN LANGUAGES & SOCIAL WELFARE */}
-      <section className="py-14 lg:py-20 bg-[#FAFBF8] px-4 sm:px-6 lg:px-8">
+      {isSectionVisible('missions') && (
+      <section
+        style={{ order: getSectionOrder('missions', 7) }}
+        className="py-14 lg:py-20 bg-[#FAFBF8] px-4 sm:px-6 lg:px-8"
+      >
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           <div className="lg:col-span-5">
             <SeamlessPhotoCanvas
@@ -982,9 +1071,14 @@ export function HomePage({ lang, onNavigate }: HomePageProps) {
           </div>
         </div>
       </section>
+      )}
 
       {/* SECTION 13 & 14: UPCOMING EVENT (HARIT MARATHON) & ANNUAL MAGAZINE */}
-      <section className="py-14 lg:py-20 bg-white px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8">
+      {(isSectionVisible('marathon') || isSectionVisible('news') || isSectionVisible('events')) && (
+      <section
+        style={{ order: getSectionOrder('marathon', 8) }}
+        className="py-14 lg:py-20 bg-white px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8"
+      >
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Harit Marathon Card — Driven dynamically from Admin Events */}
           <div className="lg:col-span-7 rounded-3xl bg-[#F3F8F2] border border-[#388E3C]/30 p-6 sm:p-8 flex flex-col justify-between">
@@ -1155,16 +1249,33 @@ export function HomePage({ lang, onNavigate }: HomePageProps) {
           </div>
         )}
       </section>
+      )}
 
       {/* SECTION 15: JOIN GOVEDA — 12 DEDICATED PARTICIPATION & REGISTRATION PATHWAYS */}
-      <section className="py-14 lg:py-20 bg-[#F3F8F2] px-4 sm:px-6 lg:px-8 border-t border-[#388E3C]/15">
+      {isSectionVisible('registrations') && (
+      <section
+        style={{ order: getSectionOrder('registrations', 9) }}
+        className="py-14 lg:py-20 bg-[#F3F8F2] px-4 sm:px-6 lg:px-8 border-t border-[#388E3C]/15"
+      >
         <div className="max-w-7xl mx-auto">
           <div className="text-center max-w-3xl mx-auto mb-10">
             <p className="text-xs font-semibold uppercase tracking-wider text-[#2E7D32]">
-              {lang === 'hi' ? 'जन-सहभागिता मंच • 12 समर्पित पंजीकरण फॉर्म' : 'Public Participation Portal • 12 Dedicated Registration Forms'}
+              {getSectionText(
+                'registrations',
+                'subtitle',
+                lang === 'hi'
+                  ? 'जन-सहभागिता मंच • 12 समर्पित पंजीकरण फॉर्म'
+                  : 'Public Participation Portal • 12 Dedicated Registration Forms'
+              )}
             </p>
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#144527] mt-1">
-              {lang === 'hi' ? 'GOVEDA से जुड़ें — अपनी समर्पित श्रेणी चुनें' : 'Join GOVEDA — Choose Your Dedicated Form'}
+              {getSectionText(
+                'registrations',
+                'heading',
+                lang === 'hi'
+                  ? 'GOVEDA से जुड़ें — अपनी समर्पित श्रेणी चुनें'
+                  : 'Join GOVEDA — Choose Your Dedicated Form'
+              )}
             </h2>
             <p className="text-sm text-stone-600 mt-2">
               {lang === 'hi'
@@ -1314,9 +1425,14 @@ export function HomePage({ lang, onNavigate }: HomePageProps) {
           </div>
         </div>
       </section>
+      )}
 
       {/* SECTION 16: TRANSPARENCY & GOVERNANCE COMMITMENT */}
-      <section className="py-12 bg-white px-4 sm:px-6 lg:px-8 border-t border-stone-200/80">
+      {isSectionVisible('csr') && (
+      <section
+        style={{ order: getSectionOrder('csr', 10) }}
+        className="py-12 bg-white px-4 sm:px-6 lg:px-8 border-t border-stone-200/80"
+      >
         <div className="max-w-7xl mx-auto">
           <div className="rounded-3xl bg-[#FAFBF8] border border-stone-200 p-6 sm:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
             <div className="lg:col-span-8 space-y-2">
@@ -1376,6 +1492,7 @@ export function HomePage({ lang, onNavigate }: HomePageProps) {
           </div>
         </div>
       </section>
+      )}
     </div>
   );
 }

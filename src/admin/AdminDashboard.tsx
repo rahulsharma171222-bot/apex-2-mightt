@@ -1,30 +1,42 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
+  AlertCircle,
   ArrowLeft,
+  BarChart3,
+  BookOpen,
   Calendar,
+  CheckCircle2,
   ChevronLeft,
   ChevronRight,
   ClipboardList,
+  Compass,
   CreditCard,
   FileText,
   Flag,
   FolderKanban,
+  GitBranch,
   Globe,
+  Handshake,
+  Image as ImageIcon,
   Inbox,
   IndianRupee,
   LayoutDashboard,
+  LayoutTemplate,
   MapPin,
   Menu,
+  Newspaper,
+  Recycle,
   RefreshCw,
+  Settings,
   Shield,
   SlidersHorizontal,
   Trophy,
+  UserCheck,
   Users,
   X,
-  CheckCircle2,
-  AlertCircle,
 } from 'lucide-react';
 import { BrandLogo } from '../components/BrandLogo';
+import { GENERATED_ASSETS } from '../data/assets';
 import { AdminOverview } from './AdminOverview';
 import { AdminSubmissions } from './AdminSubmissions';
 import { AdminFormStudio } from './AdminFormStudio';
@@ -42,9 +54,21 @@ import {
   AdminSiteGovernanceView,
   AdminTeamView,
 } from './AdminPublishingGovernance';
+import {
+  AdminHomepageSectionsView,
+  AdminMissionsManagerView,
+  AdminPagesNavView,
+} from './AdminWebsiteStudio';
+import {
+  AdminBoardAdvisoryView,
+  AdminSettingsBackupView,
+  AdminWasteManagementView,
+} from './AdminBoardWasteStudio';
+import { AdminProgrammeHub } from './AdminProgrammeHub';
 import { ApiError, adminApi } from './apiClient';
 import type {
   AdminAuditLog,
+  AdminBlueprintPayload,
   AdminCampaignRecord,
   AdminContentItem,
   AdminCsrProposal,
@@ -61,11 +85,11 @@ import type {
   AdminSubmissionRecord,
   AdminTeamMember,
   HaritMitraNetworkNode,
+  ProgrammeType,
 } from './types';
 import {
   ROLE_LABELS,
   type AdminModuleKey,
-  type AdminRole,
   type SubmissionStatus,
   type TimeframeKey,
 } from '../utils/adminLogic';
@@ -84,41 +108,83 @@ interface NavGroup {
   }[];
 }
 
+// Fixed Blueprint Sidebar Architecture (Admin_panel_450431ad.pdf §§1-10)
 const NAV_GROUPS: NavGroup[] = [
   {
-    groupLabel: 'Operations',
+    groupLabel: 'Overview',
+    items: [{ key: 'overview', label: 'Dashboard', icon: LayoutDashboard }],
+  },
+  {
+    groupLabel: 'Website Management',
     items: [
-      { key: 'overview', label: 'Overview', icon: LayoutDashboard },
-      { key: 'submissions', label: '12-Form Submissions', icon: Inbox },
-      { key: 'forms', label: '12-Form Studio', icon: SlidersHorizontal },
+      { key: 'homepage', label: 'Homepage & Sections', icon: LayoutTemplate },
+      { key: 'pages', label: 'Pages & Navigation', icon: FileText },
+      { key: 'missions', label: 'Our Missions (10)', icon: Compass },
+      { key: 'districts', label: 'Harit Rajasthan & Locations', icon: MapPin },
+      { key: 'board', label: 'Board, Team & Advisory', icon: UserCheck },
+      { key: 'gallery', label: 'Gallery & Media', icon: ImageIcon },
+      { key: 'content', label: 'News, Magazine & Reports', icon: Newspaper },
     ],
   },
   {
-    groupLabel: 'Programmes',
+    groupLabel: 'Programme Management',
     items: [
-      { key: 'campaigns', label: 'Campaigns & Roles', icon: Flag },
-      { key: 'events', label: 'Harit Marathon & Events', icon: Trophy },
-      { key: 'districts', label: 'Locations & Outreach', icon: MapPin },
-      { key: 'projects', label: 'Projects & Impact', icon: FolderKanban },
+      { key: 'programmes', label: 'All Programmes', icon: GitBranch },
+      { key: 'projects', label: 'Projects & Initiatives', icon: FolderKanban },
+      { key: 'campaigns', label: 'Campaign Management', icon: Flag },
+      { key: 'events', label: 'Events & Marathon', icon: Trophy },
+      { key: 'waste', label: 'Waste Management', icon: Recycle },
+      { key: 'training', label: 'Training & Knowledge', icon: BookOpen },
     ],
   },
   {
-    groupLabel: 'Publishing & Finance',
+    groupLabel: 'Forms & Finance',
     items: [
-      { key: 'content', label: 'Articles, Mag & Courses', icon: FileText },
-      { key: 'payments', label: 'Payments & Razorpay', icon: CreditCard },
-      { key: 'donations', label: 'CSR & Donations', icon: IndianRupee },
+      { key: 'forms', label: 'Form Builder', icon: SlidersHorizontal },
+      { key: 'submissions', label: 'Registrations & Applications', icon: Inbox },
+      { key: 'payments', label: 'Razorpay & Payments', icon: CreditCard },
+      { key: 'donations', label: 'Donations & Receipts', icon: IndianRupee },
+      { key: 'csr', label: 'CSR & Partnerships', icon: Handshake },
+      { key: 'impact', label: 'Impact & Reports', icon: BarChart3 },
     ],
   },
   {
-    groupLabel: 'Governance',
+    groupLabel: 'System Settings',
     items: [
-      { key: 'governance', label: 'Site & Legal Controls', icon: Globe },
-      { key: 'team', label: 'Team & Roles', icon: Users },
-      { key: 'audit', label: 'Audit & Supabase', icon: Shield },
+      { key: 'governance', label: 'Language & SEO', icon: Globe },
+      { key: 'team', label: 'Users & Permissions', icon: Users },
+      { key: 'audit', label: 'Activity Log', icon: Shield },
+      { key: 'settings', label: 'Settings, Backup & Security', icon: Settings },
     ],
   },
 ];
+
+const MODULE_TITLES: Record<AdminModuleKey, string> = {
+  overview: 'Control Centre Dashboard',
+  homepage: 'Homepage & Sections',
+  pages: 'Pages & Navigation',
+  missions: 'Our Missions (10 Pillars)',
+  districts: 'Harit Rajasthan & Locations',
+  board: 'Board, Team & Advisory',
+  gallery: 'Gallery & Media Library',
+  content: 'News, Magazine & Reports',
+  programmes: 'All Programmes & Hierarchy',
+  projects: 'Projects & Initiatives',
+  campaigns: 'Campaign Management',
+  events: 'Events & Marathon',
+  waste: 'Waste Management',
+  training: 'Training & Knowledge',
+  forms: 'Form Builder (12 Forms)',
+  submissions: 'Registrations & Applications',
+  payments: 'Razorpay & Payments',
+  donations: 'Donations & Receipts',
+  csr: 'CSR & Partnerships',
+  impact: 'Impact & Reports',
+  governance: 'Language, SEO & Legal Controls',
+  team: 'Users & Permissions',
+  audit: 'Activity Log',
+  settings: 'Settings, Backup & Security',
+};
 
 function getGreeting(): string {
   const hr = new Date().getHours();
@@ -128,13 +194,11 @@ function getGreeting(): string {
 }
 
 export function AdminDashboard({ onExitAdmin, onDataMutated }: AdminDashboardProps) {
-  // Session state (Direct access while Firebase Auth is disabled prior to Supabase migration)
   const [authLoading, setAuthLoading] = useState(true);
   const [adminUser, setAdminUser] = useState<AdminProfile | null>(null);
   const [allowedModules, setAllowedModules] = useState<AdminModuleKey[]>([]);
   const [authError, setAuthError] = useState<string | null>(null);
 
-  // Shell UI state
   const [activeModule, setActiveModule] = useState<AdminModuleKey>('overview');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -146,6 +210,16 @@ export function AdminDashboard({ onExitAdmin, onDataMutated }: AdminDashboardPro
   const [timeframe, setTimeframe] = useState<TimeframeKey>('30d');
   const [overviewData, setOverviewData] = useState<AdminOverviewPayload | null>(null);
   const [overviewLoading, setOverviewLoading] = useState(false);
+
+  const [createProgrammeType, setCreateProgrammeType] = useState<ProgrammeType | null>(null);
+  const [blueprint, setBlueprint] = useState<AdminBlueprintPayload>({
+    homepageSections: [],
+    staticPages: [],
+    missionConfigs: [],
+    wasteRecords: [],
+    wastePartners: [],
+    programmes: [],
+  });
 
   const [forms, setForms] = useState<AdminFormDefinition[]>([]);
   const [submissions, setSubmissions] = useState<AdminSubmissionRecord[]>([]);
@@ -218,7 +292,7 @@ export function AdminDashboard({ onExitAdmin, onDataMutated }: AdminDashboardPro
 
   useEffect(() => {
     if (!toast) return;
-    const t = setTimeout(() => setToast(null), 4000);
+    const t = setTimeout(() => setToast(null), 4200);
     return () => clearTimeout(t);
   }, [toast]);
 
@@ -246,21 +320,42 @@ export function AdminDashboard({ onExitAdmin, onDataMutated }: AdminDashboardPro
     verifySession();
   }, [verifySession]);
 
-  // Data loaders
+  const loadBlueprint = useCallback(async () => {
+    if (!adminUser) return;
+    try {
+      const bp = await adminApi.getBlueprint();
+      setBlueprint(bp);
+    } catch {
+      // Non-blocking
+    }
+  }, [adminUser]);
+
   const loadOverview = useCallback(
     async (tf: TimeframeKey = timeframe) => {
       if (!adminUser) return;
       setOverviewLoading(true);
       try {
-        const res = await adminApi.getOverview(tf);
+        const [res, bp, cmpRes, payRes] = await Promise.all([
+          adminApi.getOverview(tf),
+          adminApi.getBlueprint().catch(() => null),
+          allowedModules.includes('campaigns')
+            ? adminApi.getCampaigns().catch(() => ({ campaigns: [] }))
+            : Promise.resolve({ campaigns: [] }),
+          allowedModules.includes('payments')
+            ? adminApi.getPayments({}).catch(() => null)
+            : Promise.resolve(null),
+        ]);
         setOverviewData(res);
+        if (bp) setBlueprint(bp);
+        if (cmpRes.campaigns) setCampaigns(cmpRes.campaigns);
+        if (payRes) setPaymentData(payRes);
       } catch (err: any) {
         showToast('error', err?.message || 'Failed to load dashboard overview.');
       } finally {
         setOverviewLoading(false);
       }
     },
-    [adminUser, timeframe, showToast]
+    [adminUser, timeframe, allowedModules, showToast]
   );
 
   const loadFormsAndDistricts = useCallback(async () => {
@@ -327,6 +422,36 @@ export function AdminDashboard({ onExitAdmin, onDataMutated }: AdminDashboardPro
       try {
         if (mod === 'overview') {
           await Promise.all([loadOverview(timeframe), loadFormsAndDistricts()]);
+        } else if (mod === 'homepage' || mod === 'waste') {
+          await loadBlueprint();
+        } else if (mod === 'programmes') {
+          await Promise.all([
+            loadBlueprint(),
+            loadFormsAndDistricts(),
+            canViewSubmissions ? loadSubmissions(subFilters) : Promise.resolve(),
+          ]);
+        } else if (mod === 'pages') {
+          await Promise.all([loadBlueprint(), loadFormsAndDistricts()]);
+        } else if (mod === 'missions') {
+          const [, cmpRes, projRes, evRes] = await Promise.all([
+            loadBlueprint(),
+            allowedModules.includes('campaigns')
+              ? adminApi.getCampaigns().catch(() => ({ campaigns: [] }))
+              : Promise.resolve({ campaigns: [] }),
+            allowedModules.includes('projects')
+              ? adminApi.getProjectsAndImpact().catch(() => ({ projects: [], impactMetrics: [] }))
+              : Promise.resolve({ projects: [], impactMetrics: [] }),
+            allowedModules.includes('events')
+              ? adminApi.getEvents().catch(() => ({ events: [] }))
+              : Promise.resolve({ events: [] }),
+            loadFormsAndDistricts(),
+          ]);
+          setCampaigns(cmpRes.campaigns);
+          setProjects(projRes.projects);
+          setEvents(evRes.events);
+        } else if (mod === 'board' || mod === 'governance') {
+          const res = await adminApi.getGovernance();
+          setGovernance(res.governance);
         } else if (mod === 'submissions') {
           await Promise.all([
             loadSubmissions(subFilters),
@@ -348,25 +473,22 @@ export function AdminDashboard({ onExitAdmin, onDataMutated }: AdminDashboardPro
         } else if (mod === 'districts') {
           const res = await adminApi.getDistricts();
           setDistricts(res.districts);
-        } else if (mod === 'projects') {
+        } else if (mod === 'projects' || mod === 'impact') {
           const res = await adminApi.getProjectsAndImpact();
           setProjects(res.projects);
           setImpactMetrics(res.impactMetrics);
-        } else if (mod === 'content') {
+        } else if (mod === 'content' || mod === 'gallery' || mod === 'training') {
           const res = await adminApi.getContent();
           setContentItems(res.items);
         } else if (mod === 'payments') {
           await loadPayments(paymentFilters);
-        } else if (mod === 'donations') {
+        } else if (mod === 'donations' || mod === 'csr') {
           const [donRes, csrRes] = await Promise.all([
             adminApi.getDonations(),
             adminApi.getCsrProposals(),
           ]);
           setDonationReports(donRes.reports);
           setCsrProposals(csrRes.proposals);
-        } else if (mod === 'governance') {
-          const res = await adminApi.getGovernance();
-          setGovernance(res.governance);
         } else if (mod === 'team') {
           const [teamRes, distRes] = await Promise.all([
             adminApi.getTeam(),
@@ -377,6 +499,8 @@ export function AdminDashboard({ onExitAdmin, onDataMutated }: AdminDashboardPro
         } else if (mod === 'audit') {
           const res = await adminApi.getAuditLogs();
           setAuditLogs(res.logs);
+        } else if (mod === 'settings') {
+          await loadBlueprint();
         }
       } catch (err: any) {
         showToast('error', err?.message || 'Failed to refresh workspace data.');
@@ -385,9 +509,11 @@ export function AdminDashboard({ onExitAdmin, onDataMutated }: AdminDashboardPro
     [
       adminUser,
       timeframe,
+      allowedModules,
       subFilters,
       paymentFilters,
       loadOverview,
+      loadBlueprint,
       loadFormsAndDistricts,
       loadSubmissions,
       loadHaritMitraNetwork,
@@ -402,7 +528,6 @@ export function AdminDashboard({ onExitAdmin, onDataMutated }: AdminDashboardPro
     }
   }, [adminUser, activeModule]);
 
-  // Refetch submissions when filters change while on submissions view
   useEffect(() => {
     if (adminUser && activeModule === 'submissions') {
       const timer = setTimeout(() => {
@@ -412,7 +537,6 @@ export function AdminDashboard({ onExitAdmin, onDataMutated }: AdminDashboardPro
     }
   }, [subFilters, adminUser, activeModule]);
 
-  // Refetch payments when filters change while on payments view
   useEffect(() => {
     if (adminUser && activeModule === 'payments') {
       const timer = setTimeout(() => {
@@ -424,8 +548,8 @@ export function AdminDashboard({ onExitAdmin, onDataMutated }: AdminDashboardPro
 
   if (!adminUser) {
     return (
-      <div className="min-h-dvh bg-[#F7F9F7] text-[#142119] flex flex-col items-center justify-center p-6">
-        <div className="max-w-md w-full bg-white rounded-2xl border border-[#E2EAE4] p-7 space-y-4 text-center">
+      <div className="min-h-dvh admin-canvas text-[#142119] flex flex-col items-center justify-center p-6">
+        <div className="max-w-md w-full admin-card p-7 space-y-4 text-center">
           <BrandLogo compact />
           {authLoading ? (
             <div className="space-y-3 py-4" aria-busy="true" aria-label="Loading Admin Console">
@@ -441,14 +565,14 @@ export function AdminDashboard({ onExitAdmin, onDataMutated }: AdminDashboardPro
                 <button
                   type="button"
                   onClick={verifySession}
-                  className="px-4 py-2 rounded-xl bg-[#144527] text-white text-xs font-semibold cursor-pointer"
+                  className="admin-btn-primary px-4 py-2 rounded-xl text-xs font-semibold cursor-pointer"
                 >
                   Retry
                 </button>
                 <button
                   type="button"
                   onClick={onExitAdmin}
-                  className="px-4 py-2 rounded-xl border border-[#D4E0D7] text-xs font-medium text-[#142119] cursor-pointer"
+                  className="admin-btn-secondary px-4 py-2 rounded-xl text-xs font-medium cursor-pointer"
                 >
                   Back to Public Site
                 </button>
@@ -487,14 +611,49 @@ export function AdminDashboard({ onExitAdmin, onDataMutated }: AdminDashboardPro
     if (onDataMutated) onDataMutated();
   };
 
+  const handleExportBlueprintJson = () => {
+    const blob = new Blob([JSON.stringify(blueprint, null, 2)], {
+      type: 'application/json',
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `goveda-cms-blueprint-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('success', 'Full CMS & Waste Blueprint JSON backup downloaded.');
+  };
+
+  const adminInitials = adminUser.displayName
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((w) => w[0]?.toUpperCase() || '')
+    .join('');
+
   const sidebarContent = (
-    <div className="flex flex-col h-full justify-between">
-      <div>
-        {/* Brand Header */}
-        <div className="h-16 px-4 border-b border-[#EDF2EE] flex items-center justify-between gap-2">
-          {!sidebarCollapsed && <BrandLogo compact />}
-          {sidebarCollapsed && (
-            <div className="w-9 h-9 rounded-xl bg-[#144527] text-white font-bold text-sm flex items-center justify-center mx-auto">
+    <div className="flex flex-col h-full">
+      {/* Top Brand + Profile Card (Inspired by Dribbble Reference 1799) */}
+      <div className="p-3.5 border-b border-[#EDF2EE] space-y-3 shrink-0">
+        <div className="flex items-center justify-between gap-2 px-0.5">
+          {!sidebarCollapsed ? (
+            <div className="flex items-center gap-2.5 min-w-0 flex-1">
+              <img
+                src={GENERATED_ASSETS.officialLogo}
+                alt="GOVEDA Carbon & Climate India Foundation Official Seal"
+                referrerPolicy="no-referrer"
+                className="w-9 h-9 rounded-full object-cover ring-1 ring-[#D9C89C] shrink-0"
+              />
+              <div className="min-w-0">
+                <p className="text-sm font-extrabold tracking-tight text-[#144527] leading-tight truncate">
+                  GOVEDA<sup className="text-[9px] ml-0.5">®</sup>
+                </p>
+                <p className="text-[9.5px] font-semibold tracking-wider uppercase text-[#5C6F63] truncate">
+                  Admin Control Centre
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="w-9 h-9 rounded-xl admin-btn-primary font-bold text-sm flex items-center justify-center mx-auto">
               G
             </div>
           )}
@@ -502,7 +661,7 @@ export function AdminDashboard({ onExitAdmin, onDataMutated }: AdminDashboardPro
             type="button"
             onClick={() => setSidebarCollapsed((c) => !c)}
             aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-            className="hidden lg:inline-flex items-center justify-center w-7 h-7 rounded-lg border border-[#E2EAE4] text-[#55685C] hover:bg-[#F4F8F3] cursor-pointer shrink-0"
+            className="hidden lg:inline-flex items-center justify-center w-7 h-7 rounded-lg admin-btn-secondary text-[#55685C] cursor-pointer shrink-0"
           >
             {sidebarCollapsed ? (
               <ChevronRight className="w-4 h-4" />
@@ -512,70 +671,99 @@ export function AdminDashboard({ onExitAdmin, onDataMutated }: AdminDashboardPro
           </button>
         </div>
 
-        {/* Grouped Navigation */}
-        <nav aria-label="Admin Navigation" className="p-3 space-y-5 overflow-y-auto">
-          {NAV_GROUPS.map((group) => {
-            const visibleItems = group.items.filter((it) =>
-              allowedModules.includes(it.key)
-            );
-            if (visibleItems.length === 0) return null;
-
-            return (
-              <div key={group.groupLabel} className="space-y-1">
-                {!sidebarCollapsed && (
-                  <p className="px-3 pb-1 text-[11px] font-semibold text-[#7C8F82]">
-                    {group.groupLabel}
-                  </p>
-                )}
-                {visibleItems.map((item) => {
-                  const Icon = item.icon;
-                  const active = activeModule === item.key;
-                  const showCount = item.key === 'submissions' && pendingBadgeCount > 0;
-
-                  return (
-                    <button
-                      key={item.key}
-                      type="button"
-                      onClick={() => handleSelectModule(item.key)}
-                      title={sidebarCollapsed ? item.label : undefined}
-                      className={`w-full flex items-center justify-between gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
-                        active
-                          ? 'bg-[#144527] text-white'
-                          : 'text-[#3C4F43] hover:bg-[#EEF4EF] hover:text-[#142119]'
-                      }`}
-                    >
-                      <span className="flex items-center gap-2.5 min-w-0">
-                        <Icon className="w-4 h-4 shrink-0" aria-hidden="true" />
-                        {!sidebarCollapsed && <span className="truncate">{item.label}</span>}
-                      </span>
-                      {!sidebarCollapsed && showCount && (
-                        <span
-                          className={`font-mono text-[11px] tabular-nums px-1.5 py-0.5 rounded-md ${
-                            active
-                              ? 'bg-white/20 text-white'
-                              : 'bg-[#EDF5EE] text-[#144527]'
-                          }`}
-                        >
-                          {pendingBadgeCount}
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
+        {!sidebarCollapsed && (
+          <div className="rounded-xl bg-[#F5F9F6] border border-[#E5EFE7] p-2.5 flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-8 h-8 rounded-full bg-[#144527] text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
+                {adminInitials || 'GA'}
               </div>
-            );
-          })}
-        </nav>
+              <div className="min-w-0">
+                <p className="text-xs font-bold text-[#142119] truncate">
+                  {adminUser.displayName}
+                </p>
+                <p className="text-[10.5px] text-[#55685C] truncate">
+                  {ROLE_LABELS[adminUser.role]}
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => handleSelectModule('settings')}
+              aria-label="Open System Settings"
+              className="p-1.5 rounded-lg text-[#55685C] hover:bg-white hover:text-[#144527] transition-colors cursor-pointer shrink-0"
+            >
+              <Settings className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
       </div>
 
+      {/* Scrollable Fixed Blueprint Navigation Groups */}
+      <nav
+        aria-label="Admin Navigation"
+        className="flex-1 overflow-y-auto p-3 space-y-4 no-scrollbar"
+      >
+        {NAV_GROUPS.map((group) => {
+          const visibleItems = group.items.filter((it) =>
+            allowedModules.includes(it.key)
+          );
+          if (visibleItems.length === 0) return null;
+
+          return (
+            <div key={group.groupLabel} className="space-y-1">
+              {!sidebarCollapsed && (
+                <p className="px-3 pb-1 text-[10.5px] font-bold tracking-wider uppercase text-[#7C8F82]">
+                  {group.groupLabel}
+                </p>
+              )}
+              {visibleItems.map((item) => {
+                const Icon = item.icon;
+                const active = activeModule === item.key;
+                const showCount = item.key === 'submissions' && pendingBadgeCount > 0;
+
+                return (
+                  <button
+                    key={item.key}
+                    type="button"
+                    onClick={() => handleSelectModule(item.key)}
+                    title={sidebarCollapsed ? item.label : undefined}
+                    className={`admin-nav-btn w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl text-xs font-semibold cursor-pointer ${
+                      active
+                        ? 'admin-nav-btn-active'
+                        : 'text-[#364A3E] hover:bg-[#EDF5EE] hover:text-[#142119]'
+                    }`}
+                  >
+                    <span className="flex items-center gap-2.5 min-w-0">
+                      <Icon className="w-4 h-4 shrink-0" aria-hidden="true" />
+                      {!sidebarCollapsed && <span className="truncate">{item.label}</span>}
+                    </span>
+                    {!sidebarCollapsed && showCount && (
+                      <span
+                        className={`font-mono text-[10.5px] tabular-nums px-1.5 py-0.5 rounded-md ${
+                          active
+                            ? 'bg-white/20 text-white'
+                            : 'bg-[#E5F2E7] text-[#144527]'
+                        }`}
+                      >
+                        {pendingBadgeCount}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          );
+        })}
+      </nav>
+
       {/* Bottom Return Control */}
-      <div className="p-3 border-t border-[#EDF2EE] space-y-1.5">
+      <div className="p-3 border-t border-[#EDF2EE] shrink-0">
         <button
           type="button"
           onClick={onExitAdmin}
-          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-[#44544A] hover:bg-[#F4F8F3] hover:text-[#144527] cursor-pointer"
+          className="admin-btn-secondary w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold cursor-pointer"
         >
-          <ArrowLeft className="w-4 h-4 shrink-0" />
+          <ArrowLeft className="w-3.5 h-3.5 shrink-0" />
           {!sidebarCollapsed && <span>Back to Public Website</span>}
         </button>
       </div>
@@ -583,11 +771,11 @@ export function AdminDashboard({ onExitAdmin, onDataMutated }: AdminDashboardPro
   );
 
   return (
-    <div className="min-h-dvh bg-[#F7F9F7] text-[#142119] flex">
+    <div className="min-h-dvh admin-canvas text-[#142119] flex">
       {/* Desktop Sidebar */}
       <aside
-        className={`hidden lg:block shrink-0 bg-white border-r border-[#E2EAE4] sticky top-0 h-dvh transition-[width] duration-200 ${
-          sidebarCollapsed ? 'w-[76px]' : 'w-[260px]'
+        className={`hidden lg:block shrink-0 bg-white/95 backdrop-blur-md border-r border-[#E4ECE6] sticky top-0 h-dvh transition-[width] duration-200 ${
+          sidebarCollapsed ? 'w-[78px]' : 'w-[272px]'
         }`}
       >
         {sidebarContent}
@@ -601,7 +789,7 @@ export function AdminDashboard({ onExitAdmin, onDataMutated }: AdminDashboardPro
               type="button"
               onClick={() => setMobileMenuOpen(false)}
               aria-label="Close admin menu"
-              className="absolute right-3 top-4 w-8 h-8 rounded-lg border border-[#E2EAE4] flex items-center justify-center text-[#55685C]"
+              className="absolute right-3 top-4 w-8 h-8 rounded-lg admin-btn-secondary flex items-center justify-center text-[#55685C] z-10"
             >
               <X className="w-4 h-4" />
             </button>
@@ -611,36 +799,37 @@ export function AdminDashboard({ onExitAdmin, onDataMutated }: AdminDashboardPro
             type="button"
             aria-label="Close menu backdrop"
             onClick={() => setMobileMenuOpen(false)}
-            className="flex-1 bg-[#0E1E14]/35"
+            className="flex-1 bg-[#0E1E14]/35 backdrop-blur-[1px]"
           />
         </div>
       )}
 
       {/* Main Content Workspace */}
       <div className="flex-1 min-w-0 flex flex-col">
-        {/* Top Greeting & Context Bar */}
-        <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-sm border-b border-[#E2EAE4] px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+        {/* Sleek Top Context Bar */}
+        <header className="sticky top-0 z-30 bg-white/88 backdrop-blur-md border-b border-[#E4ECE6] px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
             <button
               type="button"
               onClick={() => setMobileMenuOpen(true)}
               aria-label="Open admin navigation"
-              className="lg:hidden inline-flex items-center justify-center w-9 h-9 rounded-xl border border-[#DCE5DE] text-[#142119] shrink-0 cursor-pointer"
+              className="lg:hidden inline-flex items-center justify-center w-9 h-9 rounded-xl admin-btn-secondary text-[#142119] shrink-0 cursor-pointer"
             >
               <Menu className="w-5 h-5" />
             </button>
             <div className="min-w-0">
+              <div className="flex items-center gap-2 text-[11px] text-[#6B7E71]">
+                <span>GOVEDA Admin</span>
+                <span aria-hidden="true">/</span>
+                <span className="font-semibold text-[#144527] truncate">
+                  {MODULE_TITLES[activeModule]}
+                </span>
+              </div>
               <h1 className="text-sm sm:text-base font-bold text-[#142119] truncate">
-                {getGreeting()}, {adminUser.displayName}
+                {activeModule === 'overview'
+                  ? `${getGreeting()}, ${adminUser.displayName}`
+                  : MODULE_TITLES[activeModule]}
               </h1>
-              <p className="text-[11px] text-[#55685C] truncate">
-                {ROLE_LABELS[adminUser.role]}
-                {adminUser.role === 'district_coordinator' &&
-                  adminUser.assignedDistricts.length > 0 &&
-                  ` · ${adminUser.assignedDistricts.join(', ')}`}
-                {' · '}
-                {adminUser.email}
-              </p>
             </div>
           </div>
 
@@ -653,7 +842,7 @@ export function AdminDashboard({ onExitAdmin, onDataMutated }: AdminDashboardPro
               type="button"
               onClick={() => loadActiveModuleData(activeModule)}
               aria-label="Refresh current view"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#DCE5DE] bg-white hover:bg-[#F4F8F3] text-xs font-semibold text-[#142119] cursor-pointer whitespace-nowrap"
+              className="admin-btn-secondary inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold cursor-pointer whitespace-nowrap"
             >
               <RefreshCw className="w-3.5 h-3.5" aria-hidden="true" />
               <span className="hidden sm:inline">Refresh</span>
@@ -662,7 +851,7 @@ export function AdminDashboard({ onExitAdmin, onDataMutated }: AdminDashboardPro
               <button
                 type="button"
                 onClick={() => setActiveModule('submissions')}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#144527] hover:bg-[#0F351E] text-white text-xs font-semibold cursor-pointer whitespace-nowrap"
+                className="admin-btn-primary inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold cursor-pointer whitespace-nowrap"
               >
                 <ClipboardList className="w-3.5 h-3.5" aria-hidden="true" />
                 <span>Review Forms</span>
@@ -671,12 +860,12 @@ export function AdminDashboard({ onExitAdmin, onDataMutated }: AdminDashboardPro
           </div>
         </header>
 
-        {/* Inline Toast Feedback */}
+        {/* Smooth Toast Banner */}
         {toast && (
           <div className="px-4 sm:px-6 lg:px-8 pt-4">
             <div
               role="status"
-              className={`rounded-xl border px-4 py-2.5 text-xs font-medium flex items-center justify-between gap-2 ${
+              className={`admin-view-enter rounded-xl border px-4 py-2.5 text-xs font-semibold flex items-center justify-between gap-2 shadow-sm ${
                 toast.type === 'success'
                   ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
                   : 'bg-red-50 border-red-200 text-red-900'
@@ -702,14 +891,24 @@ export function AdminDashboard({ onExitAdmin, onDataMutated }: AdminDashboardPro
           </div>
         )}
 
-        {/* Active Module Viewport */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-[1440px] w-full mx-auto">
+        {/* Active Module Viewport with Smooth Keyed Transition */}
+        <main
+          key={activeModule}
+          className="flex-1 p-4 sm:p-6 lg:p-8 max-w-[1440px] w-full mx-auto admin-view-enter"
+        >
           {activeModule === 'overview' && (
             <AdminOverview
               data={overviewData}
               loading={overviewLoading}
               timeframe={timeframe}
               canViewSubmissions={canViewSubmissions}
+              campaigns={campaigns}
+              wasteRecords={blueprint.wasteRecords}
+              staticPages={blueprint.staticPages}
+              missionConfigs={blueprint.missionConfigs}
+              programmes={blueprint.programmes}
+              totalPaymentsInr={paymentData.summary.totalCollectedInr}
+              verifiedPaymentsCount={paymentData.summary.capturedCount}
               onChangeTimeframe={(tf) => {
                 setTimeframe(tf);
                 loadOverview(tf);
@@ -717,6 +916,229 @@ export function AdminDashboard({ onExitAdmin, onDataMutated }: AdminDashboardPro
               onFilterByFormType={handleFilterFromOverview}
               onInspectSubmission={handleInspectFromOverview}
               onGoToSubmissions={() => setActiveModule('submissions')}
+              onNavigateModule={handleSelectModule}
+              onQuickCreateProgramme={(type) => {
+                setCreateProgrammeType(type);
+                handleSelectModule('programmes');
+              }}
+              onExportCsv={async () => {
+                try {
+                  await adminApi.downloadSubmissionsCsv(subFilters);
+                  showToast('success', 'Sanitized CSV exported successfully.');
+                } catch (err: any) {
+                  showToast('error', err?.message || 'CSV export failed.');
+                }
+              }}
+              onExportJson={async () => {
+                try {
+                  await adminApi.downloadSubmissionsJson(subFilters);
+                  showToast('success', 'JSON backup exported successfully.');
+                } catch (err: any) {
+                  showToast('error', err?.message || 'JSON backup failed.');
+                }
+              }}
+            />
+          )}
+
+          {activeModule === 'homepage' && (
+            <AdminHomepageSectionsView
+              sections={blueprint.homepageSections}
+              onSaveSections={async (sections) => {
+                try {
+                  const res = await adminApi.saveHomepageSections(sections);
+                  setBlueprint((prev) => ({
+                    ...prev,
+                    homepageSections: res.homepageSections,
+                  }));
+                  notifyPublicRefresh();
+                  showToast('success', 'Homepage section order & visibility published.');
+                } catch (err: any) {
+                  showToast('error', err?.message || 'Unable to save homepage sections.');
+                }
+              }}
+            />
+          )}
+
+          {activeModule === 'pages' && (
+            <AdminPagesNavView
+              pages={blueprint.staticPages}
+              forms={forms}
+              onSavePage={async (page) => {
+                try {
+                  const res = await adminApi.saveStaticPage(page);
+                  setBlueprint((prev) => ({ ...prev, staticPages: res.staticPages }));
+                  notifyPublicRefresh();
+                  showToast('success', `Saved page "${res.page.titleEn}" (${res.page.status}).`);
+                } catch (err: any) {
+                  showToast('error', err?.message || 'Unable to save static page.');
+                }
+              }}
+              onDeletePage={async (id) => {
+                try {
+                  await adminApi.deleteStaticPage(id);
+                  setBlueprint((prev) => ({
+                    ...prev,
+                    staticPages: prev.staticPages.filter((p) => p.id !== id),
+                  }));
+                  notifyPublicRefresh();
+                  showToast('success', 'Static page removed.');
+                } catch (err: any) {
+                  showToast('error', err?.message || 'Unable to delete page.');
+                }
+              }}
+            />
+          )}
+
+          {activeModule === 'missions' && (
+            <AdminMissionsManagerView
+              missions={blueprint.missionConfigs}
+              campaigns={campaigns}
+              projects={projects}
+              events={events}
+              forms={forms}
+              onSaveMission={async (slug, patch) => {
+                try {
+                  const res = await adminApi.saveMissionConfig(slug, patch);
+                  setBlueprint((prev) => ({
+                    ...prev,
+                    missionConfigs: res.missionConfigs,
+                  }));
+                  notifyPublicRefresh();
+                  showToast(
+                    'success',
+                    `Updated Mission #${res.mission.number} — ${res.mission.titleEn}.`
+                  );
+                } catch (err: any) {
+                  showToast('error', err?.message || 'Unable to save mission updates.');
+                }
+              }}
+            />
+          )}
+
+          {activeModule === 'programmes' && (
+            <AdminProgrammeHub
+              programmes={blueprint.programmes}
+              missions={blueprint.missionConfigs}
+              forms={forms}
+              submissions={submissions}
+              initialCreateTrigger={createProgrammeType}
+              onClearCreateTrigger={() => setCreateProgrammeType(null)}
+              onSaveProgramme={async (payload) => {
+                try {
+                  const res = await adminApi.saveProgramme(payload);
+                  setBlueprint((prev) => ({
+                    ...prev,
+                    programmes: res.programmes,
+                  }));
+                  notifyPublicRefresh();
+                  showToast(
+                    'success',
+                    `Saved ${res.programme.type} "${res.programme.titleEn}" (${res.programme.programmeCode}) · ${res.programme.publicationStatus}.`
+                  );
+                } catch (err: any) {
+                  showToast('error', err?.message || 'Unable to save programme.');
+                }
+              }}
+              onDeleteProgramme={async (id) => {
+                try {
+                  const res = await adminApi.deleteProgramme(id);
+                  setBlueprint((prev) => ({
+                    ...prev,
+                    programmes: res.programmes,
+                  }));
+                  notifyPublicRefresh();
+                  showToast('success', 'Programme removed from central hub.');
+                } catch (err: any) {
+                  showToast('error', err?.message || 'Unable to delete programme.');
+                }
+              }}
+            />
+          )}
+
+          {activeModule === 'board' && (
+            <AdminBoardAdvisoryView
+              governance={governance}
+              founderMessage={blueprint.founderMessage}
+              onUploadMedia={adminApi.uploadMedia}
+              onSaveFounderMessage={async (patch) => {
+                try {
+                  const res = await adminApi.saveFounderMessage(patch);
+                  setBlueprint((prev) => ({ ...prev, founderMessage: res.founderMessage }));
+                  notifyPublicRefresh();
+                  showToast('success', 'Founder message updated on About Us.');
+                } catch (err: any) {
+                  showToast('error', err?.message || 'Unable to save founder message.');
+                }
+              }}
+              onSaveRoster={async (leadershipRoster) => {
+                try {
+                  const res = await adminApi.saveGovernance({ leadershipRoster });
+                  setGovernance(res.governance);
+                  notifyPublicRefresh();
+                  showToast('success', 'Board, Team & Advisory directory updated.');
+                } catch (err: any) {
+                  showToast('error', err?.message || 'Unable to update board roster.');
+                }
+              }}
+            />
+          )}
+
+          {activeModule === 'waste' && (
+            <AdminWasteManagementView
+              records={blueprint.wasteRecords}
+              partners={blueprint.wastePartners}
+              onSaveRecord={async (rec) => {
+                try {
+                  const res = await adminApi.saveWasteRecord(rec);
+                  setBlueprint((prev) => ({ ...prev, wasteRecords: res.wasteRecords }));
+                  notifyPublicRefresh();
+                  showToast(
+                    'success',
+                    `Saved waste record "${res.record.title}" (${res.record.quantity} ${res.record.unit} · ${res.record.verificationStatus}).`
+                  );
+                } catch (err: any) {
+                  showToast('error', err?.message || 'Unable to save waste record.');
+                }
+              }}
+              onDeleteRecord={async (id) => {
+                try {
+                  await adminApi.deleteWasteRecord(id);
+                  setBlueprint((prev) => ({
+                    ...prev,
+                    wasteRecords: prev.wasteRecords.filter((w) => w.id !== id),
+                  }));
+                  notifyPublicRefresh();
+                  showToast('success', 'Waste activity record deleted.');
+                } catch (err: any) {
+                  showToast('error', err?.message || 'Unable to delete waste record.');
+                }
+              }}
+              onSavePartner={async (partner) => {
+                try {
+                  const res = await adminApi.saveWastePartner(partner);
+                  setBlueprint((prev) => ({
+                    ...prev,
+                    wastePartners: res.wastePartners,
+                  }));
+                  notifyPublicRefresh();
+                  showToast('success', `Saved partner "${res.partner.name}".`);
+                } catch (err: any) {
+                  showToast('error', err?.message || 'Unable to save waste partner.');
+                }
+              }}
+              onDeletePartner={async (id) => {
+                try {
+                  await adminApi.deleteWastePartner(id);
+                  setBlueprint((prev) => ({
+                    ...prev,
+                    wastePartners: prev.wastePartners.filter((p) => p.id !== id),
+                  }));
+                  notifyPublicRefresh();
+                  showToast('success', 'Waste partner removed.');
+                } catch (err: any) {
+                  showToast('error', err?.message || 'Unable to delete partner.');
+                }
+              }}
             />
           )}
 
@@ -915,6 +1337,10 @@ export function AdminDashboard({ onExitAdmin, onDataMutated }: AdminDashboardPro
             <AdminDistrictsView
               role={adminUser.role}
               districts={districts}
+              programmes={blueprint.programmes}
+              submissions={submissions}
+              onOpenProgrammes={() => setActiveModule('programmes')}
+              onOpenSubmissions={() => setActiveModule('submissions')}
               onUploadMedia={adminApi.uploadMedia}
               onSaveDistrict={async (d) => {
                 try {
@@ -940,7 +1366,7 @@ export function AdminDashboard({ onExitAdmin, onDataMutated }: AdminDashboardPro
             />
           )}
 
-          {activeModule === 'projects' && (
+          {(activeModule === 'projects' || activeModule === 'impact') && (
             <AdminProjectsImpactView
               role={adminUser.role}
               projects={projects}
@@ -986,9 +1412,18 @@ export function AdminDashboard({ onExitAdmin, onDataMutated }: AdminDashboardPro
             />
           )}
 
-          {activeModule === 'content' && (
+          {(activeModule === 'content' ||
+            activeModule === 'gallery' ||
+            activeModule === 'training') && (
             <AdminContentView
               items={contentItems}
+              initialFilter={
+                activeModule === 'gallery'
+                  ? 'gallery'
+                  : activeModule === 'training'
+                  ? 'training'
+                  : 'all'
+              }
               onUploadMedia={adminApi.uploadMedia}
               onSaveItem={async (item) => {
                 try {
@@ -1035,10 +1470,11 @@ export function AdminDashboard({ onExitAdmin, onDataMutated }: AdminDashboardPro
             />
           )}
 
-          {activeModule === 'donations' && (
+          {(activeModule === 'donations' || activeModule === 'csr') && (
             <AdminDonationsView
               reports={donationReports}
               csrProposals={csrProposals}
+              initialSubTab={activeModule === 'donations' ? 'ledger' : 'csr'}
               onUploadMedia={adminApi.uploadMedia}
               onSaveReport={async (r) => {
                 try {
@@ -1131,6 +1567,26 @@ export function AdminDashboard({ onExitAdmin, onDataMutated }: AdminDashboardPro
           )}
 
           {activeModule === 'audit' && <AdminAuditLogView logs={auditLogs} />}
+
+          {activeModule === 'settings' && (
+            <AdminSettingsBackupView
+              onExportSubmissionsCsv={async () => {
+                await adminApi.downloadSubmissionsCsv({});
+                showToast('success', 'All submissions CSV exported.');
+              }}
+              onExportSubmissionsJson={async () => {
+                await adminApi.downloadSubmissionsJson({});
+                showToast('success', 'All submissions JSON backup downloaded.');
+              }}
+              onExportPaymentsCsv={async () => {
+                await adminApi.downloadPaymentsCsv({});
+                showToast('success', 'Payments ledger CSV exported.');
+              }}
+              onExportBlueprintJson={handleExportBlueprintJson}
+              onGoToGovernance={() => handleSelectModule('governance')}
+              onGoToAudit={() => handleSelectModule('audit')}
+            />
+          )}
         </main>
       </div>
     </div>

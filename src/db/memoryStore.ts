@@ -1,3 +1,4 @@
+import { blueprintStore } from './blueprintStore.ts';
 import {
   adminUsers,
   auditLogs,
@@ -288,6 +289,7 @@ export const memoryRepo = {
         .filter((c) => c.isPublished)
         .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime()),
       siteGovernance: sanitized.siteGovernance,
+      ...blueprintStore.getPublicBlueprintPayload(),
     };
   },
 

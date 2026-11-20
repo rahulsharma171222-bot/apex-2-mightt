@@ -71,15 +71,35 @@ export interface ContentCourseMetaSpec {
 export interface LeadershipMemberSpec {
   id: string;
   name: string;
-  category: 'Leadership' | 'Advisory';
+  category:
+    | 'Leadership'
+    | 'Advisory'
+    | 'Board of Directors'
+    | 'Founder & President'
+    | 'Office Bearers'
+    | 'Advisory Board'
+    | 'Executive Team'
+    | 'District Coordinators'
+    | 'Volunteers / Experts'
+    | string;
   advisoryDomain?: string;
   roleHi: string;
   roleEn: string;
   qualification?: string;
+  experience?: string;
+  expertise?: string;
+  responsibilitiesEn?: string;
+  responsibilitiesHi?: string;
+  founderMessageEn?: string;
+  founderMessageHi?: string;
+  assignedDistrict?: string;
   bioHi: string;
   bioEn: string;
   photoUrl: string;
   linkedinUrl?: string;
+  websiteUrl?: string;
+  publicationStatus?: 'Draft' | 'Review' | 'Published';
+  consentConfirmed?: boolean;
   confirmedForPublic: boolean;
 }
 
@@ -448,3 +468,10 @@ export const auditLogs = pgTable(
   },
   (table) => [index('audit_logs_created_at_idx').on(table.createdAt)]
 );
+
+export const cmsBlueprintState = pgTable('cms_blueprint_state', {
+  id: text('id').primaryKey().default('default'),
+  payload: jsonb('payload').$type<Record<string, unknown>>().notNull().default({}),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+

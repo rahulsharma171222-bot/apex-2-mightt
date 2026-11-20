@@ -3,6 +3,8 @@ import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { HomePage } from './pages/HomePage';
 import { HaritRajasthanPage } from './pages/HaritRajasthanPage';
+import { HaritRajasthanGeographicPage } from './pages/HaritRajasthanGeographicPage';
+import { ProjectsAndCampaignsPage } from './pages/ProjectsAndCampaignsPage';
 import { CarbonCreditPage } from './pages/CarbonCreditPage';
 import { AtmanirbharGaushalaPage } from './pages/AtmanirbharGaushalaPage';
 import { SeniorCitizenCarePage } from './pages/SeniorCitizenCarePage';
@@ -14,7 +16,7 @@ import { WomenEmpowermentPage } from './pages/WomenEmpowermentPage';
 import { SkillDevelopmentPage } from './pages/SkillDevelopmentPage';
 import { HaritBharatPage } from './pages/HaritBharatPage';
 import { MissionsPage } from './pages/MissionsPage';
-import { AboutPage, ProjectsPage } from './pages/AboutAndProjectsPages';
+import { AboutPage } from './pages/AboutAndProjectsPages';
 import {
   EventsPage,
   HaritMarathonPage,
@@ -27,8 +29,10 @@ import {
   PartnershipPage,
 } from './pages/JoinPartnershipContactPages';
 import { AdminDashboard } from './admin/AdminDashboard';
+import { DynamicCmsPage } from './pages/DynamicCmsPage';
+import { LiveMissionCmsBlock } from './components/LiveMissionCmsBlock';
 import { fetchPublicBootstrap } from './admin/apiClient';
-import type { PublicBootstrapPayload } from './admin/types';
+import type { PublicBootstrapPayload, StaticPageRecord } from './admin/types';
 import { PublicPortalProvider } from './context/PublicPortalContext';
 import { SEED_REGISTRATIONS } from './utils/govedaLogic';
 import type { Language, RegistrationCategory, RegistrationRecord } from './types/goveda';
@@ -157,9 +161,55 @@ export default function App() {
       return <AboutPage lang={lang} onNavigate={handleNavigate} />;
     }
 
+    const findPublishedCmsPage = (rawPath: string): StaticPageRecord | null => {
+      const pages = (bootstrap?.staticPages ?? []).filter((p) => p.status === 'Published');
+      if (pages.length === 0) return null;
+      const clean = rawPath.replace(/^\/+|\/+$/g, '').toLowerCase();
+      if (!clean) return null;
+      const slugCandidate = clean.startsWith('pages/')
+        ? clean.slice('pages/'.length)
+        : clean.split('/').pop() || clean;
+      return (
+        pages.find(
+          (p) =>
+            p.slug.toLowerCase() === slugCandidate ||
+            p.slug.toLowerCase() === clean
+        ) ?? null
+      );
+    };
+
+    if (path.startsWith('/pages/')) {
+      const matched = findPublishedCmsPage(path);
+      if (matched) {
+        return <DynamicCmsPage page={matched} lang={lang} onNavigate={handleNavigate} />;
+      }
+    }
+
     if (path === '/missions/carbon-credit') {
       return (
-        <CarbonCreditPage
+        <>
+          <CarbonCreditPage
+            lang={lang}
+            records={records}
+            onAddRecord={handleAddRecord}
+            onNavigate={handleNavigate}
+          />
+          <LiveMissionCmsBlock
+            missionSlug="carbon-climate"
+            lang={lang}
+            onNavigate={handleNavigate}
+          />
+        </>
+      );
+    }
+
+    if (path === '/harit-bharat' || path === '/missions/harit-bharat') {
+      return <HaritBharatPage lang={lang} onNavigate={handleNavigate} />;
+    }
+
+    if (path === '/harit-rajasthan') {
+      return (
+        <HaritRajasthanGeographicPage
           lang={lang}
           records={records}
           onAddRecord={handleAddRecord}
@@ -168,18 +218,21 @@ export default function App() {
       );
     }
 
-    if (path === '/harit-bharat' || path === '/missions/harit-bharat') {
-      return <HaritBharatPage lang={lang} onNavigate={handleNavigate} />;
-    }
-
-    if (path === '/missions/harit-rajasthan' || path === '/harit-rajasthan') {
+    if (path === '/missions/harit-rajasthan') {
       return (
-        <HaritRajasthanPage
-          lang={lang}
-          records={records}
-          onAddRecord={handleAddRecord}
-          onNavigate={handleNavigate}
-        />
+        <>
+          <HaritRajasthanPage
+            lang={lang}
+            records={records}
+            onAddRecord={handleAddRecord}
+            onNavigate={handleNavigate}
+          />
+          <LiveMissionCmsBlock
+            missionSlug="harit-rajasthan"
+            lang={lang}
+            onNavigate={handleNavigate}
+          />
+        </>
       );
     }
 
@@ -188,12 +241,19 @@ export default function App() {
       path === '/missions/atmanirbhar-gaushala'
     ) {
       return (
-        <AtmanirbharGaushalaPage
-          lang={lang}
-          records={records}
-          onAddRecord={handleAddRecord}
-          onNavigate={handleNavigate}
-        />
+        <>
+          <AtmanirbharGaushalaPage
+            lang={lang}
+            records={records}
+            onAddRecord={handleAddRecord}
+            onNavigate={handleNavigate}
+          />
+          <LiveMissionCmsBlock
+            missionSlug="atmanirbhar-gaushala"
+            lang={lang}
+            onNavigate={handleNavigate}
+          />
+        </>
       );
     }
 
@@ -203,12 +263,19 @@ export default function App() {
       path === '/missions/vriddha-ashram'
     ) {
       return (
-        <SeniorCitizenCarePage
-          lang={lang}
-          records={records}
-          onAddRecord={handleAddRecord}
-          onNavigate={handleNavigate}
-        />
+        <>
+          <SeniorCitizenCarePage
+            lang={lang}
+            records={records}
+            onAddRecord={handleAddRecord}
+            onNavigate={handleNavigate}
+          />
+          <LiveMissionCmsBlock
+            missionSlug="senior-care-mental-health"
+            lang={lang}
+            onNavigate={handleNavigate}
+          />
+        </>
       );
     }
 
@@ -217,12 +284,19 @@ export default function App() {
       path === '/missions/jaivik-kheti'
     ) {
       return (
-        <OrganicFarmingPage
-          lang={lang}
-          records={records}
-          onAddRecord={handleAddRecord}
-          onNavigate={handleNavigate}
-        />
+        <>
+          <OrganicFarmingPage
+            lang={lang}
+            records={records}
+            onAddRecord={handleAddRecord}
+            onNavigate={handleNavigate}
+          />
+          <LiveMissionCmsBlock
+            missionSlug="organic-farming"
+            lang={lang}
+            onNavigate={handleNavigate}
+          />
+        </>
       );
     }
 
@@ -232,12 +306,20 @@ export default function App() {
       path === '/missions/swachh-urja'
     ) {
       return (
-        <CleanEnergyPage
-          lang={lang}
-          records={records}
-          onAddRecord={handleAddRecord}
-          onNavigate={handleNavigate}
-        />
+        <>
+          <CleanEnergyPage
+            lang={lang}
+            records={records}
+            onAddRecord={handleAddRecord}
+            onNavigate={handleNavigate}
+          />
+          <LiveMissionCmsBlock
+            missionSlug="swachh-urja"
+            lang={lang}
+            onNavigate={handleNavigate}
+            hideProgrammes
+          />
+        </>
       );
     }
 
@@ -246,12 +328,19 @@ export default function App() {
       path === '/missions/heritage-water-solar'
     ) {
       return (
-        <HeritageWaterSolarPage
-          lang={lang}
-          records={records}
-          onAddRecord={handleAddRecord}
-          onNavigate={handleNavigate}
-        />
+        <>
+          <HeritageWaterSolarPage
+            lang={lang}
+            records={records}
+            onAddRecord={handleAddRecord}
+            onNavigate={handleNavigate}
+          />
+          <LiveMissionCmsBlock
+            missionSlug="heritage-water"
+            lang={lang}
+            onNavigate={handleNavigate}
+          />
+        </>
       );
     }
 
@@ -260,12 +349,20 @@ export default function App() {
       path === '/missions/swachh-bharat'
     ) {
       return (
-        <CleanIndiaPlasticFreePage
-          lang={lang}
-          records={records}
-          onAddRecord={handleAddRecord}
-          onNavigate={handleNavigate}
-        />
+        <>
+          <CleanIndiaPlasticFreePage
+            lang={lang}
+            records={records}
+            onAddRecord={handleAddRecord}
+            onNavigate={handleNavigate}
+          />
+          <LiveMissionCmsBlock
+            missionSlug="clean-india"
+            lang={lang}
+            onNavigate={handleNavigate}
+            hideProgrammes
+          />
+        </>
       );
     }
 
@@ -274,12 +371,19 @@ export default function App() {
       path === '/missions/mahila-sashaktikaran'
     ) {
       return (
-        <WomenEmpowermentPage
-          lang={lang}
-          records={records}
-          onAddRecord={handleAddRecord}
-          onNavigate={handleNavigate}
-        />
+        <>
+          <WomenEmpowermentPage
+            lang={lang}
+            records={records}
+            onAddRecord={handleAddRecord}
+            onNavigate={handleNavigate}
+          />
+          <LiveMissionCmsBlock
+            missionSlug="women-empowerment"
+            lang={lang}
+            onNavigate={handleNavigate}
+          />
+        </>
       );
     }
 
@@ -288,12 +392,20 @@ export default function App() {
       path === '/missions/kaushal-vikas'
     ) {
       return (
-        <SkillDevelopmentPage
-          lang={lang}
-          records={records}
-          onAddRecord={handleAddRecord}
-          onNavigate={handleNavigate}
-        />
+        <>
+          <SkillDevelopmentPage
+            lang={lang}
+            records={records}
+            onAddRecord={handleAddRecord}
+            onNavigate={handleNavigate}
+          />
+          <LiveMissionCmsBlock
+            missionSlug="skill-development"
+            lang={lang}
+            onNavigate={handleNavigate}
+            hideProgrammes
+          />
+        </>
       );
     }
 
@@ -324,7 +436,7 @@ export default function App() {
     if (path.startsWith('/harit-rajasthan/')) {
       const slug = path.replace('/harit-rajasthan/', '').split('/')[0];
       return (
-        <HaritRajasthanPage
+        <HaritRajasthanGeographicPage
           lang={lang}
           districtSlug={slug}
           records={records}
@@ -364,8 +476,14 @@ export default function App() {
       );
     }
 
-    if (path === '/projects') {
-      return <ProjectsPage lang={lang} onNavigate={handleNavigate} />;
+    if (path === '/projects' || path === '/campaigns') {
+      return (
+        <ProjectsAndCampaignsPage
+          lang={lang}
+          onNavigate={handleNavigate}
+          initialTypeFilter={path === '/campaigns' ? 'campaign' : 'all'}
+        />
+      );
     }
 
     if (path === '/events') {
@@ -407,6 +525,17 @@ export default function App() {
 
     if (path === '/contact' || path.startsWith('/legal')) {
       return <ContactPage lang={lang} />;
+    }
+
+    const dynamicStaticMatch = findPublishedCmsPage(path);
+    if (dynamicStaticMatch) {
+      return (
+        <DynamicCmsPage
+          page={dynamicStaticMatch}
+          lang={lang}
+          onNavigate={handleNavigate}
+        />
+      );
     }
 
     return <HomePage lang={lang} onNavigate={handleNavigate} />;

@@ -10,6 +10,7 @@ import {
   requireModuleAccess,
   type AdminRequest,
 } from './src/middleware/auth.ts';
+import { blueprintStore } from './src/db/blueprintStore.ts';
 import {
   bulkUpdateSubmissionStatus,
   createPaymentTransaction,
@@ -1150,6 +1151,284 @@ async function startServer() {
         res.json({ deleted: true });
       } catch (error: any) {
         res.status(500).json({ error: error?.message || 'Failed to delete campaign.' });
+      }
+    }
+  );
+
+  // --- Blueprint Modules: Homepage Sections, Pages & Navigation, 10 Missions, Waste Management, Unified Programmes ---
+  app.get('/api/admin/blueprint', requireAdmin, async (_req, res) => {
+    try {
+      res.json(blueprintStore.getAll());
+    } catch (error: any) {
+      res.status(500).json({ error: error?.message || 'Failed to load blueprint workspace.' });
+    }
+  });
+
+  app.get(
+    '/api/admin/programmes',
+    requireAdmin,
+    requireModuleAccess('programmes'),
+    async (_req, res) => {
+      try {
+        res.json({ programmes: blueprintStore.getAll().programmes });
+      } catch (error: any) {
+        res.status(500).json({ error: error?.message || 'Failed to load unified programmes.' });
+      }
+    }
+  );
+
+  app.post(
+    '/api/admin/programmes',
+    requireAdmin,
+    requireModuleAccess('programmes'),
+    async (req: AdminRequest, res) => {
+      try {
+        const admin = req.adminUser!;
+        const saved = blueprintStore.upsertProgramme(req.body ?? {});
+        await writeAuditLog({
+          actorEmail: admin.email,
+          actorRole: admin.role,
+          action: 'SAVE_UNIFIED_PROGRAMME',
+          entityType: 'programmes',
+          entityId: saved.programmeCode,
+          summary: `Saved ${saved.type} "${saved.titleEn}" (${saved.publicationStatus} / ${saved.operationalStatus})${saved.parentId ? ` under parent ${saved.parentId}` : ''}`,
+        });
+        res.json({ programme: saved, programmes: blueprintStore.getAll().programmes });
+      } catch (error: any) {
+        res.status(500).json({ error: error?.message || 'Failed to save programme.' });
+      }
+    }
+  );
+
+  app.delete(
+    '/api/admin/programmes/:id',
+    requireAdmin,
+    requireModuleAccess('programmes'),
+    async (req: AdminRequest, res) => {
+      try {
+        const admin = req.adminUser!;
+        const deleted = blueprintStore.deleteProgramme(req.params.id);
+        if (!deleted) {
+          return res.status(404).json({ error: 'Programme record not found.' });
+        }
+        await writeAuditLog({
+          actorEmail: admin.email,
+          actorRole: admin.role,
+          action: 'DELETE_UNIFIED_PROGRAMME',
+          entityType: 'programmes',
+          entityId: deleted.programmeCode,
+          summary: `Deleted ${deleted.type} "${deleted.titleEn}"`,
+        });
+        res.json({ deleted: true, programmes: blueprintStore.getAll().programmes });
+      } catch (error: any) {
+        res.status(500).json({ error: error?.message || 'Failed to delete programme.' });
+      }
+    }
+  );
+
+  app.put(
+    '/api/admin/founder-message',
+    requireAdmin,
+    requireModuleAccess('board'),
+    async (req: AdminRequest, res) => {
+      try {
+        const admin = req.adminUser!;
+        const saved = blueprintStore.saveFounderMessage(req.body ?? {});
+        await writeAuditLog({
+          actorEmail: admin.email,
+          actorRole: admin.role,
+          action: 'SAVE_FOUNDER_MESSAGE',
+          entityType: 'founder_message',
+          entityId: 'about-us',
+          summary: `Updated Founder Message (${saved.showOnAboutUs ? 'Visible on About Us' : 'Hidden'})`,
+        });
+        res.json({ founderMessage: saved });
+      } catch (error: any) {
+        res.status(500).json({ error: error?.message || 'Failed to save founder message.' });
+      }
+    }
+  );
+
+  app.put(
+    '/api/admin/homepage-sections',
+    requireAdmin,
+    requireModuleAccess('homepage'),
+    async (req: AdminRequest, res) => {
+      try {
+        const admin = req.adminUser!;
+        const sections = Array.isArray(req.body?.sections) ? req.body.sections : [];
+        if (sections.length === 0) {
+          return res.status(400).json({ error: 'Homepage sections payload is required.' });
+        }
+        const saved = blueprintStore.saveHomepageSections(sections);
+        await writeAuditLog({
+          actorEmail: admin.email,
+          actorRole: admin.role,
+          action: 'SAVE_HOMEPAGE_SECTIONS',
+          entityType: 'homepage_sections',
+          entityId: `${saved.length} sections`,
+          summary: `Updated homepage layout (${saved.filter((s) => s.enabled && s.visible).length}/${saved.length} visible)`,
+        });
+        res.json({ homepageSections: saved });
+      } catch (error: any) {
+        res.status(500).json({ error: error?.message || 'Failed to save homepage sections.' });
+      }
+    }
+  );
+
+  app.post(
+    '/api/admin/pages',
+    requireAdmin,
+    requireModuleAccess('pages'),
+    async (req: AdminRequest, res) => {
+      try {
+        const admin = req.adminUser!;
+        const saved = blueprintStore.upsertStaticPage(req.body ?? {});
+        await writeAuditLog({
+          actorEmail: admin.email,
+          actorRole: admin.role,
+          action: 'SAVE_STATIC_PAGE',
+          entityType: 'static_pages',
+          entityId: saved.slug,
+          summary: `Saved page "${saved.titleEn}" (${saved.status}) under ${saved.parentPath}`,
+        });
+        res.json({ page: saved, staticPages: blueprintStore.getAll().staticPages });
+      } catch (error: any) {
+        res.status(500).json({ error: error?.message || 'Failed to save static page.' });
+      }
+    }
+  );
+
+  app.delete(
+    '/api/admin/pages/:id',
+    requireAdmin,
+    requireModuleAccess('pages'),
+    async (req: AdminRequest, res) => {
+      try {
+        const admin = req.adminUser!;
+        const deleted = blueprintStore.deleteStaticPage(String(req.params.id));
+        if (!deleted) return res.status(404).json({ error: 'Page not found.' });
+        await writeAuditLog({
+          actorEmail: admin.email,
+          actorRole: admin.role,
+          action: 'DELETE_STATIC_PAGE',
+          entityType: 'static_pages',
+          entityId: deleted.slug,
+          summary: `Deleted static page "${deleted.titleEn}"`,
+        });
+        res.json({ deleted: true });
+      } catch (error: any) {
+        res.status(500).json({ error: error?.message || 'Failed to delete static page.' });
+      }
+    }
+  );
+
+  app.put(
+    '/api/admin/missions/:slug',
+    requireAdmin,
+    requireModuleAccess('missions'),
+    async (req: AdminRequest, res) => {
+      try {
+        const admin = req.adminUser!;
+        const slug = String(req.params.slug || '').trim();
+        const saved = blueprintStore.updateMissionConfig(slug, req.body ?? {});
+        if (!saved) return res.status(404).json({ error: 'Mission not found.' });
+        await writeAuditLog({
+          actorEmail: admin.email,
+          actorRole: admin.role,
+          action: 'UPDATE_MISSION',
+          entityType: 'missions',
+          entityId: saved.slug,
+          summary: `Updated Mission #${saved.number} "${saved.titleEn}" (${saved.status})`,
+        });
+        res.json({ mission: saved, missionConfigs: blueprintStore.getAll().missionConfigs });
+      } catch (error: any) {
+        res.status(500).json({ error: error?.message || 'Failed to update mission.' });
+      }
+    }
+  );
+
+  app.post(
+    '/api/admin/waste/records',
+    requireAdmin,
+    requireModuleAccess('waste'),
+    async (req: AdminRequest, res) => {
+      try {
+        const admin = req.adminUser!;
+        const saved = blueprintStore.upsertWasteRecord(req.body ?? {});
+        await writeAuditLog({
+          actorEmail: admin.email,
+          actorRole: admin.role,
+          action: 'SAVE_WASTE_RECORD',
+          entityType: 'waste_records',
+          entityId: saved.id,
+          summary: `Logged ${saved.quantity} ${saved.unit} ${saved.category} in ${saved.district} (${saved.verificationStatus})`,
+        });
+        res.json({ record: saved, wasteRecords: blueprintStore.getAll().wasteRecords });
+      } catch (error: any) {
+        res.status(500).json({ error: error?.message || 'Failed to save waste activity record.' });
+      }
+    }
+  );
+
+  app.delete(
+    '/api/admin/waste/records/:id',
+    requireAdmin,
+    requireModuleAccess('waste'),
+    async (req: AdminRequest, res) => {
+      try {
+        const admin = req.adminUser!;
+        const deleted = blueprintStore.deleteWasteRecord(String(req.params.id));
+        if (!deleted) return res.status(404).json({ error: 'Waste record not found.' });
+        await writeAuditLog({
+          actorEmail: admin.email,
+          actorRole: admin.role,
+          action: 'DELETE_WASTE_RECORD',
+          entityType: 'waste_records',
+          entityId: deleted.id,
+          summary: `Deleted waste record "${deleted.title}"`,
+        });
+        res.json({ deleted: true });
+      } catch (error: any) {
+        res.status(500).json({ error: error?.message || 'Failed to delete waste record.' });
+      }
+    }
+  );
+
+  app.post(
+    '/api/admin/waste/partners',
+    requireAdmin,
+    requireModuleAccess('waste'),
+    async (req: AdminRequest, res) => {
+      try {
+        const admin = req.adminUser!;
+        const saved = blueprintStore.upsertWastePartner(req.body ?? {});
+        await writeAuditLog({
+          actorEmail: admin.email,
+          actorRole: admin.role,
+          action: 'SAVE_WASTE_PARTNER',
+          entityType: 'waste_partners',
+          entityId: saved.id,
+          summary: `Saved waste partner "${saved.name}" (${saved.partnerType})`,
+        });
+        res.json({ partner: saved, wastePartners: blueprintStore.getAll().wastePartners });
+      } catch (error: any) {
+        res.status(500).json({ error: error?.message || 'Failed to save waste partner.' });
+      }
+    }
+  );
+
+  app.delete(
+    '/api/admin/waste/partners/:id',
+    requireAdmin,
+    requireModuleAccess('waste'),
+    async (req: AdminRequest, res) => {
+      try {
+        const deleted = blueprintStore.deleteWastePartner(String(req.params.id));
+        if (!deleted) return res.status(404).json({ error: 'Waste partner not found.' });
+        res.json({ deleted: true });
+      } catch (error: any) {
+        res.status(500).json({ error: error?.message || 'Failed to delete waste partner.' });
       }
     }
   );

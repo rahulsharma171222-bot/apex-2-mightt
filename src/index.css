@@ -144,16 +144,191 @@
   scrollbar-width: none;
 }
 
+/* ==========================================================================
+   GOVEDA Admin Console — Tactile Premium Surfaces, Buttons & Smooth Charts
+   ========================================================================== */
+
+.admin-canvas {
+  background-color: #F4F7F5;
+  background-image: radial-gradient(at 0% 0%, rgba(54, 135, 55, 0.045) 0px, transparent 48%),
+    radial-gradient(at 100% 0%, rgba(20, 69, 39, 0.04) 0px, transparent 45%);
+}
+
+.admin-card {
+  background: #ffffff;
+  border: 1px solid rgba(20, 69, 39, 0.08);
+  border-radius: 1.125rem;
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.03),
+    0 8px 24px -14px rgba(16, 56, 32, 0.11);
+  transition:
+    transform 220ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 220ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 180ms ease;
+}
+
+.admin-card-interactive:hover {
+  transform: translateY(-2px);
+  border-color: rgba(54, 135, 55, 0.22);
+  box-shadow:
+    0 2px 6px rgba(15, 23, 42, 0.04),
+    0 16px 32px -14px rgba(20, 69, 39, 0.17);
+}
+
+.admin-btn-primary {
+  background: linear-gradient(180deg, #1B5A34 0%, #134226 100%);
+  color: #ffffff;
+  border: 1px solid rgba(13, 49, 28, 0.9);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 4px 12px -2px rgba(20, 69, 39, 0.36),
+    0 1px 2px rgba(16, 56, 32, 0.22);
+  transition:
+    transform 190ms cubic-bezier(0.22, 1.35, 0.36, 1),
+    box-shadow 200ms cubic-bezier(0.16, 1, 0.3, 1),
+    filter 160ms ease;
+}
+
+.admin-btn-primary:hover:not(:disabled) {
+  transform: translateY(-1.5px);
+  filter: brightness(1.06);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 10px 22px -4px rgba(20, 69, 39, 0.44),
+    0 2px 6px rgba(16, 56, 32, 0.22);
+}
+
+.admin-btn-primary:active:not(:disabled) {
+  transform: translateY(0px) scale(0.98);
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.18),
+    0 2px 6px -1px rgba(20, 69, 39, 0.3);
+}
+
+.admin-btn-secondary {
+  background: linear-gradient(180deg, #ffffff 0%, #F9FBF9 100%);
+  color: #16281D;
+  border: 1px solid #DCE6DF;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 4px 10px -6px rgba(20, 69, 39, 0.12);
+  transition:
+    transform 180ms cubic-bezier(0.22, 1.3, 0.36, 1),
+    box-shadow 190ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 160ms ease,
+    background-color 160ms ease,
+    color 160ms ease;
+}
+
+.admin-btn-secondary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: #B4CEBC;
+  background: #ffffff;
+  color: #134226;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    0 6px 16px -6px rgba(20, 69, 39, 0.18),
+    0 1px 3px rgba(15, 23, 42, 0.06);
+}
+
+.admin-btn-secondary:active:not(:disabled) {
+  transform: translateY(0px) scale(0.985);
+}
+
+.admin-btn-soft {
+  background: #EEF6EF;
+  color: #144527;
+  border: 1px solid #D3E6D6;
+  box-shadow: 0 1px 2px rgba(20, 69, 39, 0.05);
+  transition:
+    transform 180ms cubic-bezier(0.22, 1.3, 0.36, 1),
+    box-shadow 190ms cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 160ms ease,
+    border-color 160ms ease;
+}
+
+.admin-btn-soft:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: #E2F1E4;
+  border-color: #B5D7BA;
+  box-shadow: 0 6px 14px -6px rgba(20, 69, 39, 0.22);
+}
+
+.admin-btn-soft:active:not(:disabled) {
+  transform: translateY(0px) scale(0.985);
+}
+
+.admin-nav-btn {
+  transition:
+    transform 160ms cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 160ms ease,
+    color 160ms ease,
+    box-shadow 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.admin-nav-btn:hover {
+  transform: translateX(2px);
+}
+
+.admin-nav-btn-active {
+  background: linear-gradient(135deg, #164C2C 0%, #1F683D 100%);
+  color: #ffffff;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 6px 16px -4px rgba(20, 69, 39, 0.38);
+}
+
+.admin-nav-btn-active:hover {
+  transform: translateX(0px);
+}
+
+@keyframes adminViewEnter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 7px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.admin-view-enter {
+  animation: adminViewEnter 230ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.admin-ring-progress {
+  transition: stroke-dashoffset 700ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.admin-chart-path {
+  transition: d 320ms cubic-bezier(0.16, 1, 0.3, 1), opacity 220ms ease;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .spring-btn,
-  .spring-card {
+  .spring-card,
+  .admin-card,
+  .admin-btn-primary,
+  .admin-btn-secondary,
+  .admin-btn-soft,
+  .admin-nav-btn,
+  .admin-ring-progress,
+  .admin-chart-path {
     transition: none;
   }
   .spring-btn:hover,
   .spring-btn:active,
-  .spring-card:hover {
+  .spring-card:hover,
+  .admin-card-interactive:hover,
+  .admin-btn-primary:hover,
+  .admin-btn-secondary:hover,
+  .admin-btn-soft:hover,
+  .admin-nav-btn:hover {
     transform: none;
   }
+  .admin-view-enter,
   .animate-leaf-drift,
   .animate-leaf-drift-reverse,
   .animate-sun-pulse,
@@ -162,3 +337,4 @@
     animation: none;
   }
 }
+

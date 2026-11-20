@@ -14,18 +14,29 @@ export type TimeframeKey = '1d' | '7d' | '30d' | '16m' | 'max';
 
 export type AdminModuleKey =
   | 'overview'
-  | 'submissions'
-  | 'forms'
+  | 'homepage'
+  | 'pages'
+  | 'missions'
+  | 'districts'
+  | 'board'
+  | 'gallery'
+  | 'content'
+  | 'programmes'
+  | 'projects'
   | 'campaigns'
   | 'events'
-  | 'districts'
-  | 'projects'
-  | 'content'
+  | 'waste'
+  | 'training'
+  | 'forms'
+  | 'submissions'
   | 'payments'
   | 'donations'
+  | 'csr'
+  | 'impact'
   | 'governance'
   | 'team'
-  | 'audit';
+  | 'audit'
+  | 'settings';
 
 export const VALID_SUBMISSION_STATUSES: SubmissionStatus[] = [
   'Submitted',
@@ -51,21 +62,53 @@ export const ROLE_LABELS: Record<AdminRole, string> = {
 const ROLE_MODULES: Record<AdminRole, AdminModuleKey[]> = {
   super_admin: [
     'overview',
-    'submissions',
-    'forms',
+    'homepage',
+    'pages',
+    'missions',
+    'districts',
+    'board',
+    'gallery',
+    'content',
+    'programmes',
+    'projects',
     'campaigns',
     'events',
-    'districts',
-    'projects',
-    'content',
+    'waste',
+    'training',
+    'forms',
+    'submissions',
     'payments',
     'donations',
+    'csr',
+    'impact',
     'governance',
     'team',
     'audit',
+    'settings',
   ],
-  district_coordinator: ['overview', 'submissions', 'campaigns', 'events', 'districts', 'projects'],
-  content_editor: ['overview', 'campaigns', 'events', 'content'],
+  district_coordinator: [
+    'overview',
+    'districts',
+    'programmes',
+    'projects',
+    'campaigns',
+    'events',
+    'waste',
+    'submissions',
+    'impact',
+  ],
+  content_editor: [
+    'overview',
+    'homepage',
+    'pages',
+    'missions',
+    'gallery',
+    'content',
+    'programmes',
+    'campaigns',
+    'events',
+    'training',
+  ],
 };
 
 const MONTHS_EN = [
@@ -698,7 +741,7 @@ export interface SanitizableSiteGovernance {
   leadershipRoster?: {
     id: string;
     name: string;
-    category: 'Leadership' | 'Advisory';
+    category: string;
     roleHi: string;
     roleEn: string;
     bioHi: string;
@@ -763,7 +806,12 @@ export function sanitizePublicRecords<
             input.siteGovernance.bankConfirmedForPublic === true &&
             input.siteGovernance.paymentGatewayEnabled === true,
           leadershipRoster: Array.isArray(input.siteGovernance.leadershipRoster)
-            ? input.siteGovernance.leadershipRoster.filter((m) => m.confirmedForPublic === true)
+            ? input.siteGovernance.leadershipRoster.filter(
+                (m) =>
+                  m.confirmedForPublic === true &&
+                  (!(m as { publicationStatus?: string }).publicationStatus ||
+                    (m as { publicationStatus?: string }).publicationStatus === 'Published')
+              )
             : [],
           annualReports: Array.isArray((input.siteGovernance as any).annualReports)
             ? (input.siteGovernance as any).annualReports.filter(
@@ -774,4 +822,225 @@ export function sanitizePublicRecords<
       : null,
   };
 }
+
+export interface WasteRecordLike {
+  category: string;
+  quantity: number;
+  unit: 'kg' | 'tonnes' | string;
+  householdsCount: number;
+  participantsCount: number;
+  verificationStatus: 'Submitted' | 'Verified' | 'Published' | string;
+}
+
+export interface WasteImpactSummary {
+  totalRecords: number;
+  verifiedRecordsCount: number;
+  pendingRecordsCount: number;
+  verifiedTotalKg: number;
+  verifiedHouseholds: number;
+  verifiedParticipants: number;
+  byCategoryKg: { category: string; kg: number; count: number }[];
+}
+
+export function summarizeWasteRecords(records: WasteRecordLike[]): WasteImpactSummary {
+  const verified = records.filter(
+    (r) => r.verificationStatus === 'Verified' || r.verificationStatus === 'Published'
+  );
+  const categoryMap = new Map<string, { kg: number; count: number }>();
+  let verifiedTotalKg = 0;
+  let verifiedHouseholds = 0;
+  let verifiedParticipants = 0;
+
+  for (const r of verified) {
+    const qty = Number(r.quantity) || 0;
+    const kg = r.unit === 'tonnes' ? qty * 1000 : qty;
+    verifiedTotalKg += kg;
+    verifiedHouseholds += Number(r.householdsCount) || 0;
+    verifiedParticipants += Number(r.participantsCount) || 0;
+    const prev = categoryMap.get(r.category) ?? { kg: 0, count: 0 };
+    categoryMap.set(r.category, { kg: prev.kg + kg, count: prev.count + 1 });
+  }
+
+  return {
+    totalRecords: records.length,
+    verifiedRecordsCount: verified.length,
+    pendingRecordsCount: Math.max(0, records.length - verified.length),
+    verifiedTotalKg: Math.round(verifiedTotalKg * 10) / 10,
+    verifiedHouseholds,
+    verifiedParticipants,
+    byCategoryKg: Array.from(categoryMap.entries())
+      .map(([category, info]) => ({
+        category,
+        kg: Math.round(info.kg * 10) / 10,
+        count: info.count,
+      }))
+      .sort((a, b) => b.kg - a.kg),
+  };
+}
+
+export function generateProgrammeCode(
+  type: 'project' | 'campaign' | 'event' | 'training' | string,
+  locationHint: string,
+  seq?: number
+): string {
+  const typeMap: Record<string, string> = {
+    project: 'PRJ',
+    campaign: 'CMP',
+    event: 'EVT',
+    training: 'TRN',
+  };
+  const typePrefix = typeMap[type] ?? 'PRG';
+  const locPrefix = (locationHint || 'IND')
+    .toUpperCase()
+    .replace(/[^A-Z]/g, '')
+    .slice(0, 3)
+    .padEnd(3, 'X');
+  const year = new Date().getFullYear();
+  const suffix =
+    typeof seq === 'number'
+      ? String(1000 + (Math.abs(Math.floor(seq)) % 9000)).padStart(4, '0')
+      : String(Math.floor(1000 + Math.random() * 9000));
+  return `GVD-${typePrefix}-${locPrefix}-${year}-${suffix}`;
+}
+
+export const ADVISORY_EXPERTISE_CATEGORIES = [
+  'Climate Science & Carbon MRV',
+  'Agroforestry & Native Forestry',
+  'Organic Agriculture & Soil Health',
+  'Gaushala & Veterinary Science',
+  'Biogas, CBG & Clean Energy',
+  'Water Conservation & Hydrology',
+  'Rural Development & Women SHGs',
+  'Skill Development, Youth & Global Languages',
+  'Elderly Care, Mental Health & Social Welfare',
+  'Cultural Heritage, Governance & Legal / CSR',
+] as const;
+
+export interface ProgrammeHierarchyLike {
+  id: string;
+  type: 'project' | 'campaign' | 'event' | 'training' | string;
+  parentId: string | null;
+  titleEn: string;
+  coverageScope?: 'specific' | 'india-wide' | string;
+  locations?: { stateName: string; district: string; localityName?: string }[];
+  missionSlug?: string;
+  missionSlugs?: string[];
+  publicationStatus?: string;
+  operationalStatus?: string;
+}
+
+export interface ProgrammeTreeNode<T extends ProgrammeHierarchyLike> {
+  item: T;
+  children: ProgrammeTreeNode<T>[];
+}
+
+/**
+ * Organizes Unified Programmes into a clean Project -> Campaign -> Event / Training tree
+ * while preserving standalone items safely at root level.
+ */
+export function buildProgrammeHierarchyTree<T extends ProgrammeHierarchyLike>(
+  programmes: T[]
+): ProgrammeTreeNode<T>[] {
+  const nodeMap = new Map<string, ProgrammeTreeNode<T>>();
+  for (const p of programmes) {
+    nodeMap.set(p.id, { item: p, children: [] });
+  }
+
+  const roots: ProgrammeTreeNode<T>[] = [];
+  for (const p of programmes) {
+    const node = nodeMap.get(p.id)!;
+    if (p.parentId && p.parentId !== p.id && nodeMap.has(p.parentId)) {
+      nodeMap.get(p.parentId)!.children.push(node);
+    } else {
+      roots.push(node);
+    }
+  }
+
+  const typeOrder: Record<string, number> = {
+    project: 0,
+    campaign: 1,
+    event: 2,
+    training: 3,
+  };
+  const sortNodes = (list: ProgrammeTreeNode<T>[]) => {
+    list.sort(
+      (a, b) =>
+        (typeOrder[a.item.type] ?? 9) - (typeOrder[b.item.type] ?? 9) ||
+        a.item.titleEn.localeCompare(b.item.titleEn)
+    );
+    for (const n of list) sortNodes(n.children);
+  };
+  sortNodes(roots);
+  return roots;
+}
+
+/**
+ * Multi-location + India-wide + Multi-Mission filter for Unified Programmes.
+ * Powers Harit Rajasthan, National Projects, Events, Training, and Mission pages
+ * from one central database record.
+ */
+export function filterUnifiedProgrammes<T extends ProgrammeHierarchyLike>(
+  programmes: T[],
+  criteria: {
+    type?: string;
+    stateName?: string;
+    district?: string;
+    missionSlug?: string;
+    publicationStatus?: string;
+    query?: string;
+    onlyPublished?: boolean;
+  }
+): T[] {
+  const q = (criteria.query || '').trim().toLowerCase();
+  const stateFilter = (criteria.stateName || '').trim().toLowerCase();
+  const districtFilter = (criteria.district || '').trim().toLowerCase();
+
+  return programmes.filter((p) => {
+    if (criteria.onlyPublished && p.publicationStatus !== 'Published') return false;
+    if (criteria.type && criteria.type !== 'all' && p.type !== criteria.type) return false;
+    if (
+      criteria.publicationStatus &&
+      criteria.publicationStatus !== 'all' &&
+      p.publicationStatus !== criteria.publicationStatus
+    ) {
+      return false;
+    }
+    if (criteria.missionSlug && criteria.missionSlug !== 'all') {
+      const linked = new Set<string>([
+        ...(p.missionSlug ? [p.missionSlug] : []),
+        ...(Array.isArray(p.missionSlugs) ? p.missionSlugs : []),
+      ]);
+      if (!linked.has(criteria.missionSlug)) {
+        return false;
+      }
+    }
+
+    if (stateFilter && stateFilter !== 'all') {
+      const matchesState =
+        p.coverageScope === 'india-wide' ||
+        (p.locations ?? []).some((loc) => loc.stateName.toLowerCase() === stateFilter);
+      if (!matchesState) return false;
+    }
+
+    if (districtFilter && districtFilter !== 'all') {
+      const matchesDistrict =
+        p.coverageScope === 'india-wide' ||
+        (p.locations ?? []).some((loc) => loc.district.toLowerCase() === districtFilter);
+      if (!matchesDistrict) return false;
+    }
+
+    if (q) {
+      const locText = (p.locations ?? [])
+        .map((l) => `${l.stateName} ${l.district} ${l.localityName || ''}`)
+        .join(' ')
+        .toLowerCase();
+      const hay = `${p.titleEn} ${p.type} ${p.missionSlug || ''} ${locText}`.toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+
+    return true;
+  });
+}
+
+
 

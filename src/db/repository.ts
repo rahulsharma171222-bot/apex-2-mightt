@@ -1,5 +1,6 @@
 import { and, asc, desc, eq, gte, inArray, lte, sql } from 'drizzle-orm';
 import { db, isDatabaseConfigured } from './index.ts';
+import { blueprintStore } from './blueprintStore.ts';
 import { memoryRepo } from './memoryStore.ts';
 import {
   adminUsers,
@@ -361,6 +362,8 @@ export async function getPublicBootstrapData() {
         siteGovernance: rawGov,
       });
 
+      await blueprintStore.hydrateFromDatabase();
+
       return {
         forms,
         districts: sanitized.districts,
@@ -371,6 +374,7 @@ export async function getPublicBootstrapData() {
         contentItems: contentRows,
         csrProposals: csrRows,
         siteGovernance: sanitized.siteGovernance,
+        ...blueprintStore.getPublicBlueprintPayload(),
       };
     },
     () => memoryRepo.getPublicBootstrapData()

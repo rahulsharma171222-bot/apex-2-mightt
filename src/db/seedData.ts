@@ -1310,7 +1310,58 @@ export const DEFAULT_SITE_GOVERNANCE: {
   panNumber: '',
   darpanId: '',
   msmeNumber: '',
-  leadershipRoster: [],
+  leadershipRoster: [
+    {
+      id: 'ldr-founder-president',
+      name: 'Raj Kumar Poonia',
+      category: 'Founder & President',
+      roleEn: 'Founder & President',
+      roleHi: 'संस्थापक एवं अध्यक्ष',
+      qualification: '',
+      experience: 'Founder & President, GOVEDA Carbon & Climate India Foundation (Section 8)',
+      responsibilitiesEn:
+        'Institutional stewardship, national green mission architecture (Harit Rajasthan to Harit Bharat), farmer & Gaushala empowerment, and transparent governance oversight.',
+      responsibilitiesHi:
+        'संस्थागत नेतृत्व, हरित राजस्थान से हरित भारत राष्ट्रीय अभियान की परिकल्पना, किसान एवं गौशाला सशक्तीकरण तथा पारदर्शी प्रशासन।',
+      founderMessageEn:
+        'Environmental restoration endures only when farmers, Gaushalas, villages, youth, and institutions stand together as partners. GOVEDA Carbon & Climate India Foundation is built on honest ground action, transparent documentation, and shared stewardship from Harit Rajasthan to Harit Bharat.',
+      founderMessageHi:
+        'पर्यावरण संरक्षण तभी स्थायी होता है जब किसान, गौशालाएँ, ग्राम समाज, युवा और संस्थाएँ एक साथ सहभागी बनें। GOVEDA कार्बन एवं क्लाइमेट इंडिया फाउंडेशन ईमानदार धरातलीय कार्य, पारदर्शी दस्तावेज़ीकरण और हरित राजस्थान से हरित भारत के सामूहिक संकल्प पर आधारित है।',
+      bioEn:
+        'Founder & President of GOVEDA Carbon & Climate India Foundation, guiding the foundation’s Section 8 mission across climate awareness, native tree plantation, self-reliant Gaushalas, rural livelihoods, and community well-being.',
+      bioHi:
+        'GOVEDA कार्बन एवं क्लाइमेट इंडिया फाउंडेशन के संस्थापक एवं अध्यक्ष — जलवायु जागरूकता, देशी वृक्षारोपण, आत्मनिर्भर गौशाला, ग्रामीण आजीविका और सामाजिक कल्याण के एकीकृत मिशन का नेतृत्व।',
+      photoUrl: '',
+      linkedinUrl: '',
+      websiteUrl: '',
+      publicationStatus: 'Published',
+      consentConfirmed: true,
+      confirmedForPublic: true,
+    },
+    {
+      id: 'ldr-vice-president',
+      name: 'Vice President (Add Approved Name)',
+      category: 'Office Bearers',
+      roleEn: 'Vice President',
+      roleHi: 'उपाध्यक्ष',
+      qualification: '',
+      experience: '',
+      responsibilitiesEn:
+        'Programme coordination, institutional partnerships, district outreach supervision, and community engagement across Rajasthan.',
+      responsibilitiesHi:
+        'कार्यक्रम समन्वय, संस्थागत साझेदारी, जिला संपर्क पर्यवेक्षण और सामुदायिक सहभागिता।',
+      bioEn:
+        'Replace with the Vice President’s approved biography, qualifications, and professional photograph before publishing.',
+      bioHi:
+        'प्रकाशन से पूर्व उपाध्यक्ष का स्वीकृत परिचय, योग्यता और आधिकारिक छायाचित्र यहाँ अद्यतन करें।',
+      photoUrl: '',
+      linkedinUrl: '',
+      websiteUrl: '',
+      publicationStatus: 'Draft',
+      consentConfirmed: false,
+      confirmedForPublic: false,
+    },
+  ],
   annualReports: [],
 };
 

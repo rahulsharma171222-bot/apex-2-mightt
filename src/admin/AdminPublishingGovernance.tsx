@@ -44,6 +44,7 @@ import { ROLE_LABELS, slugifyTitle, type AdminRole } from '../utils/adminLogic';
 
 interface AdminContentViewProps {
   items: AdminContentItem[];
+  initialFilter?: string;
   onSaveItem: (item: Partial<AdminContentItem>) => Promise<void>;
   onDeleteItem: (id: string) => Promise<void>;
   onUploadMedia: (file: File) => Promise<{
@@ -69,11 +70,15 @@ const EMPTY_COURSE_META = {
 
 export function AdminContentView({
   items,
+  initialFilter = 'all',
   onSaveItem,
   onDeleteItem,
   onUploadMedia,
 }: AdminContentViewProps) {
-  const [filterType, setFilterType] = useState<string>('all');
+  const [filterType, setFilterType] = useState<string>(initialFilter);
+  React.useEffect(() => {
+    setFilterType(initialFilter);
+  }, [initialFilter]);
   const [editing, setEditing] = useState<Partial<AdminContentItem> | null>(null);
   const [editorTab, setEditorTab] = useState<'write' | 'preview'>('write');
   const [activeBodyLang, setActiveBodyLang] = useState<'en' | 'hi'>('en');
@@ -878,6 +883,7 @@ export function AdminContentView({
 interface AdminDonationsViewProps {
   reports: AdminDonationReport[];
   csrProposals: AdminCsrProposal[];
+  initialSubTab?: 'csr' | 'ledger';
   onSaveReport: (r: Partial<AdminDonationReport>) => Promise<void>;
   onDeleteReport: (id: string) => Promise<void>;
   onSaveCsrProposal: (p: Partial<AdminCsrProposal>) => Promise<void>;
@@ -893,13 +899,17 @@ interface AdminDonationsViewProps {
 export function AdminDonationsView({
   reports,
   csrProposals,
+  initialSubTab = 'csr',
   onSaveReport,
   onDeleteReport,
   onSaveCsrProposal,
   onDeleteCsrProposal,
   onUploadMedia,
 }: AdminDonationsViewProps) {
-  const [subTab, setSubTab] = useState<'csr' | 'ledger'>('csr');
+  const [subTab, setSubTab] = useState<'csr' | 'ledger'>(initialSubTab);
+  React.useEffect(() => {
+    setSubTab(initialSubTab);
+  }, [initialSubTab]);
   const [editingReport, setEditingReport] = useState<Partial<AdminDonationReport> | null>(null);
   const [editingProposal, setEditingProposal] = useState<Partial<AdminCsrProposal> | null>(null);
   const [saving, setSaving] = useState(false);

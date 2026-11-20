@@ -1,11 +1,15 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  ADVISORY_EXPERTISE_CATEGORIES,
   buildAnalyticsSeries,
   buildFormTypeBreakdown,
+  buildProgrammeHierarchyTree,
   buildSubmissionsCsv,
   canAccessAdminModule,
+  filterUnifiedProgrammes,
   generateHaritMitraCode,
+  generateProgrammeCode,
   generateUniqueCampaignCode,
   generateUniqueMemberId,
   isDistrictAllowed,
@@ -13,9 +17,11 @@ import {
   parseDateFilterBound,
   sanitizeCsvCell,
   sanitizePublicRecords,
+  summarizeWasteRecords,
   validatePublicSubmissionPayload,
   validateUploadFileName,
 } from './adminLogic';
+import { getCitiesAndGramsForDistrict } from '../data/indiaLocations';
 
 test('RBAC module permissions strictly enforce 3-tier access control', () => {
   assert.equal(canAccessAdminModule('super_admin', 'team'), true);
@@ -270,5 +276,250 @@ test('Unique member/campaign ID generators and campaigns RBAC work as expected',
   const cmpId = generateUniqueCampaignCode('Ahmedabad', 42);
   assert.match(cmpId, /^GVD-CMP-AHM-\d{4}-1042$/);
 });
+
+test('summarizeWasteRecords counts only Verified/Published entries and converts tonnes to kg', () => {
+  const summary = summarizeWasteRecords([
+    {
+      category: 'Dry Plastic',
+      quantity: 125,
+      unit: 'kg',
+      householdsCount: 60,
+      participantsCount: 38,
+      verificationStatus: 'Verified',
+    },
+    {
+      category: 'Compostable / Organic',
+      quantity: 1.5,
+      unit: 'tonnes',
+      householdsCount: 120,
+      participantsCount: 45,
+      verificationStatus: 'Published',
+    },
+    {
+      category: 'Dry Plastic',
+      quantity: 900,
+      unit: 'kg',
+      householdsCount: 500,
+      participantsCount: 200,
+      verificationStatus: 'Submitted',
+    },
+  ]);
+
+  assert.equal(summary.totalRecords, 3);
+  assert.equal(summary.verifiedRecordsCount, 2);
+  assert.equal(summary.pendingRecordsCount, 1);
+  assert.equal(summary.verifiedTotalKg, 1625);
+  assert.equal(summary.verifiedHouseholds, 180);
+  assert.equal(summary.verifiedParticipants, 83);
+  assert.equal(summary.byCategoryKg[0].category, 'Compostable / Organic');
+  assert.equal(summary.byCategoryKg[0].kg, 1500);
+  assert.equal(summary.byCategoryKg[1].category, 'Dry Plastic');
+  assert.equal(summary.byCategoryKg[1].kg, 125);
+});
+
+test('Blueprint RBAC modules enforce role boundaries across Website, Programme, Finance, and Settings', () => {
+  assert.equal(canAccessAdminModule('super_admin', 'homepage'), true);
+  assert.equal(canAccessAdminModule('super_admin', 'pages'), true);
+  assert.equal(canAccessAdminModule('super_admin', 'missions'), true);
+  assert.equal(canAccessAdminModule('super_admin', 'board'), true);
+  assert.equal(canAccessAdminModule('super_admin', 'waste'), true);
+  assert.equal(canAccessAdminModule('super_admin', 'settings'), true);
+
+  assert.equal(canAccessAdminModule('district_coordinator', 'waste'), true);
+  assert.equal(canAccessAdminModule('district_coordinator', 'homepage'), false);
+  assert.equal(canAccessAdminModule('district_coordinator', 'settings'), false);
+
+  assert.equal(canAccessAdminModule('content_editor', 'homepage'), true);
+  assert.equal(canAccessAdminModule('content_editor', 'pages'), true);
+  assert.equal(canAccessAdminModule('content_editor', 'missions'), true);
+  assert.equal(canAccessAdminModule('content_editor', 'gallery'), true);
+  assert.equal(canAccessAdminModule('content_editor', 'waste'), false);
+  assert.equal(canAccessAdminModule('content_editor', 'settings'), false);
+});
+
+test('Unified Programme Hub generates typed codes, enforces RBAC, builds Project -> Campaign -> Event hierarchy, and filters multi-location/India-Wide items', () => {
+  assert.equal(canAccessAdminModule('super_admin', 'programmes'), true);
+  assert.equal(canAccessAdminModule('district_coordinator', 'programmes'), true);
+  assert.equal(canAccessAdminModule('content_editor', 'programmes'), true);
+
+  assert.match(generateProgrammeCode('project', 'Bhilwara', 7), /^GVD-PRJ-BHI-\d{4}-1007$/);
+  assert.match(generateProgrammeCode('campaign', 'Churu', 14), /^GVD-CMP-CHU-\d{4}-1014$/);
+  assert.match(generateProgrammeCode('event', 'Jodhpur', 3), /^GVD-EVT-JOD-\d{4}-1003$/);
+  assert.match(generateProgrammeCode('training', 'Bikaner', 9), /^GVD-TRN-BIK-\d{4}-1009$/);
+
+  const sampleProgrammes = [
+    {
+      id: 'p-root',
+      parentId: null,
+      type: 'project' as const,
+      titleEn: 'Bhilwara Green Village Development',
+      titleHi: 'भीलवाड़ा हरित ग्राम विकास',
+      programmeCode: 'GVD-PRJ-BHI-2026-1001',
+      missionSlug: 'harit-rajasthan',
+      coverageScope: 'specific' as const,
+      publicationStatus: 'Published',
+      locations: [{ stateName: 'Rajasthan', district: 'Bhilwara', localityName: 'Mandalgarh' }],
+    },
+    {
+      id: 'c-child',
+      parentId: 'p-root',
+      type: 'campaign' as const,
+      titleEn: 'Mandalgarh Monsoon Plantation Campaign',
+      titleHi: 'मांडलगढ़ मानसून अभियान',
+      programmeCode: 'GVD-CMP-BHI-2026-1002',
+      missionSlug: 'harit-rajasthan',
+      coverageScope: 'specific' as const,
+      publicationStatus: 'Published',
+      locations: [{ stateName: 'Rajasthan', district: 'Bhilwara', localityName: 'Mandalgarh' }],
+    },
+    {
+      id: 'e-grandchild',
+      parentId: 'c-child',
+      type: 'event' as const,
+      titleEn: 'Gram Panchayat Sapling Camp',
+      titleHi: 'ग्राम पंचायत पौधरोपण शिविर',
+      programmeCode: 'GVD-EVT-BHI-2026-1003',
+      missionSlug: 'harit-rajasthan',
+      coverageScope: 'specific' as const,
+      publicationStatus: 'Published',
+      locations: [{ stateName: 'Rajasthan', district: 'Bhilwara', localityName: 'Mandalgarh' }],
+    },
+    {
+      id: 'p-india',
+      parentId: null,
+      type: 'project' as const,
+      titleEn: 'Clean India Plastic-Free Mission',
+      titleHi: 'स्वच्छ भारत प्लास्टिक मुक्त मिशन',
+      programmeCode: 'GVD-PRJ-IND-2026-1004',
+      missionSlug: 'clean-india',
+      coverageScope: 'india-wide' as const,
+      publicationStatus: 'Published',
+      locations: [{ stateName: 'Rajasthan', district: 'Jodhpur', localityName: '' }],
+    },
+    {
+      id: 'p-draft',
+      parentId: null,
+      type: 'training' as const,
+      titleEn: 'Internal Draft Workshop',
+      titleHi: 'ड्राफ्ट कार्यशाला',
+      programmeCode: 'GVD-TRN-BHI-2026-1005',
+      missionSlug: 'harit-rajasthan',
+      coverageScope: 'specific' as const,
+      publicationStatus: 'Draft',
+      locations: [{ stateName: 'Rajasthan', district: 'Bhilwara', localityName: '' }],
+    },
+  ];
+
+  // Hierarchy nesting: p-root -> c-child -> e-grandchild, plus p-india and p-draft as roots
+  const tree = buildProgrammeHierarchyTree(sampleProgrammes);
+  assert.equal(tree.length, 3);
+  const bhilwaraRoot = tree.find((n) => n.item.id === 'p-root');
+  assert.ok(bhilwaraRoot);
+  assert.equal(bhilwaraRoot.children.length, 1);
+  assert.equal(bhilwaraRoot.children[0].item.id, 'c-child');
+  assert.equal(bhilwaraRoot.children[0].children.length, 1);
+  assert.equal(bhilwaraRoot.children[0].children[0].item.id, 'e-grandchild');
+
+  // Public filter excludes Drafts
+  const pubOnly = filterUnifiedProgrammes(sampleProgrammes, { onlyPublished: true });
+  assert.equal(pubOnly.length, 4);
+  assert.equal(pubOnly.some((x) => x.id === 'p-draft'), false);
+
+  // District filter includes matching district AND India-wide projects
+  const churuMatches = filterUnifiedProgrammes(sampleProgrammes, {
+    stateName: 'Rajasthan',
+    district: 'Churu',
+    onlyPublished: true,
+  });
+  assert.equal(churuMatches.length, 1);
+  assert.equal(churuMatches[0].id, 'p-india');
+
+  // Mission filter isolates clean-india cleanly
+  const cleanIndiaOnly = filterUnifiedProgrammes(sampleProgrammes, {
+    missionSlug: 'clean-india',
+    onlyPublished: true,
+  });
+  assert.equal(cleanIndiaOnly.length, 1);
+  assert.equal(cleanIndiaOnly[0].id, 'p-india');
+});
+
+test('Advisory categories, leadership Draft/Published gating, multi-mission filtering, and cascading City -> Gram/Ward helper work accurately', () => {
+  assert.equal(ADVISORY_EXPERTISE_CATEGORIES.length, 10);
+
+  const safe = sanitizePublicRecords({
+    districts: [],
+    marathonEvents: [],
+    projects: [],
+    siteGovernance: {
+      officeConfirmedForPublic: true,
+      headOfficeAddressHi: '',
+      headOfficeAddressEn: '',
+      officialPhone: '',
+      bankConfirmedForPublic: false,
+      bankAccountSummary: '',
+      paymentGatewayEnabled: false,
+      eightyGApproved: false,
+      fcraApproved: false,
+      leadershipRoster: [
+        {
+          id: 'l-pub',
+          name: 'Raj Kumar Poonia',
+          category: 'Founder & President',
+          roleHi: 'संस्थापक एवं अध्यक्ष',
+          roleEn: 'Founder & President',
+          bioHi: '',
+          bioEn: '',
+          photoUrl: '',
+          confirmedForPublic: true,
+          publicationStatus: 'Published',
+        },
+        {
+          id: 'l-draft',
+          name: 'Pending VP',
+          category: 'Office Bearers',
+          roleHi: 'उपाध्यक्ष',
+          roleEn: 'Vice President',
+          bioHi: '',
+          bioEn: '',
+          photoUrl: '',
+          confirmedForPublic: true,
+          publicationStatus: 'Draft',
+        },
+      ],
+    },
+  });
+  assert.equal(safe.siteGovernance?.leadershipRoster.length, 1);
+  assert.equal(safe.siteGovernance?.leadershipRoster[0].id, 'l-pub');
+
+  // Multi-mission matching
+  const multiMissionMatches = filterUnifiedProgrammes(
+    [
+      {
+        id: 'mm-1',
+        parentId: null,
+        type: 'project',
+        titleEn: 'Churu Gaushala Biogas Pilot',
+        titleHi: 'चूरू गौशाला पायलट',
+        programmeCode: 'GVD-PRJ-CHU-2026-1006',
+        missionSlug: 'atmanirbhar-gaushala',
+        missionSlugs: ['atmanirbhar-gaushala', 'swachh-urja'],
+        coverageScope: 'specific',
+        publicationStatus: 'Published',
+        locations: [{ stateName: 'Rajasthan', district: 'Churu', localityName: 'Thathawata' }],
+      },
+    ],
+    { missionSlug: 'swachh-urja', onlyPublished: true }
+  );
+  assert.equal(multiMissionMatches.length, 1);
+
+  // Cascading City -> Gram/Ward helper returns rich cities & grams for Bhilwara and graceful fallback for any district
+  const bhilwaraCities = getCitiesAndGramsForDistrict('Bhilwara');
+  assert.ok(bhilwaraCities.some((c) => c.name === 'Mandalgarh' && c.villages.includes('Bijoliya')));
+  const genericCities = getCitiesAndGramsForDistrict('Baran');
+  assert.ok(genericCities.length >= 2 && genericCities[0].villages.length >= 2);
+});
+
+
+
 
 

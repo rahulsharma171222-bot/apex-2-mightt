@@ -5,6 +5,7 @@ import {
   Compass,
   FileText,
   Flag,
+  GitBranch,
   Globe2,
   MapPin,
   RotateCcw,
@@ -22,6 +23,10 @@ import {
   getStatesSummary,
   resolvePanIndiaLocationFeed,
 } from '../utils/haritBharatLogic';
+import {
+  buildProgrammeHierarchyTree,
+  filterUnifiedProgrammes,
+} from '../utils/adminLogic';
 import type { Language } from '../types/goveda';
 
 interface HaritBharatPageProps {
@@ -49,6 +54,24 @@ export function HaritBharatPage({ lang, onNavigate }: HaritBharatPageProps) {
       }),
     [bootstrap, stateSlug, district, subDistrict, villageOrTown]
   );
+
+  const matchingUnifiedProgrammes = useMemo(
+    () =>
+      filterUnifiedProgrammes(bootstrap?.programmes ?? [], {
+        stateName: feed.selectedStateNameEn || 'all',
+        district: district || 'all',
+        query: villageOrTown || subDistrict || '',
+        onlyPublished: true,
+      }),
+    [bootstrap?.programmes, feed.selectedStateNameEn, district, subDistrict, villageOrTown]
+  );
+
+  const unifiedTree = useMemo(
+    () => buildProgrammeHierarchyTree(matchingUnifiedProgrammes),
+    [matchingUnifiedProgrammes]
+  );
+
+  const combinedMatchCount = feed.totalMatches + matchingUnifiedProgrammes.length;
 
   const handleStateChange = (nextStateSlug: string) => {
     setStateSlug(nextStateSlug);
@@ -392,7 +415,7 @@ export function HaritBharatPage({ lang, onNavigate }: HaritBharatPageProps) {
                   {activeBreadcrumb.join(' › ')}
                 </span>
                 <span className="px-2.5 py-0.5 rounded-full bg-[#EAF4E6] text-[#154A24] font-bold tabular-nums">
-                  {feed.totalMatches}{' '}
+                  {combinedMatchCount}{' '}
                   {lang === 'hi' ? 'सक्रिय रिकॉर्ड' : 'Live Matches'}
                 </span>
               </div>
@@ -422,7 +445,7 @@ export function HaritBharatPage({ lang, onNavigate }: HaritBharatPageProps) {
           </div>
 
           {/* LIVE MATCHING RESULTS */}
-          {feed.totalMatches === 0 ? (
+          {combinedMatchCount === 0 ? (
             <div className="rounded-3xl border border-dashed border-[#C8922A]/50 bg-[#FBFAF6] p-8 sm:p-10 text-center space-y-4">
               <div className="w-12 h-12 rounded-2xl bg-[#EEF5E6] text-[#154A24] mx-auto flex items-center justify-center">
                 <Compass className="w-6 h-6" />
@@ -457,6 +480,149 @@ export function HaritBharatPage({ lang, onNavigate }: HaritBharatPageProps) {
             </div>
           ) : (
             <div className="space-y-10">
+              {/* Unified Central Programmes (Project -> Campaign -> Event / Training) */}
+              {unifiedTree.length > 0 && (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 text-sm font-extrabold uppercase tracking-wider text-[#5A7B3B]">
+                    <GitBranch className="w-4 h-4" />
+                    <span>
+                      {lang === 'hi'
+                        ? `एकीकृत परियोजनाएँ, अभियान व क्षेत्रीय गतिविधियाँ (${matchingUnifiedProgrammes.length})`
+                        : `Live Unified Programmes — Projects, Campaigns & Activities (${matchingUnifiedProgrammes.length})`}
+                    </span>
+                  </div>
+                  <div className="space-y-4">
+                    {unifiedTree.map((root) => {
+                      const p = root.item;
+                      const cover =
+                        p.media.find((m) => m.isCover && m.url) ??
+                        p.media.find((m) => m.mediaType === 'photo' && m.url);
+                      const firstDistrict = p.locations[0]?.district || district || 'Bhilwara';
+                      const regUrl = `/join/${encodeURIComponent(
+                        p.linkedFormType || 'farmer'
+                      )}?campaign=${encodeURIComponent(p.programmeCode)}&campaignTitle=${encodeURIComponent(
+                        p.titleEn
+                      )}&district=${encodeURIComponent(firstDistrict)}`;
+
+                      return (
+                        <div
+                          key={p.id}
+                          className="rounded-3xl bg-[#FBFAF6] border border-[#DFD8C5] overflow-hidden"
+                        >
+                          <div className="p-5 sm:p-6 flex flex-col lg:flex-row gap-5">
+                            {cover && (
+                              <img
+                                src={cover.url}
+                                alt={cover.altText || p.titleEn}
+                                className="w-full lg:w-56 h-40 rounded-2xl object-cover border border-[#E5DEC8] shrink-0"
+                              />
+                            )}
+                            <div className="flex-1 space-y-2.5">
+                              <div className="flex flex-wrap items-center gap-2 text-[11px]">
+                                <span className="px-2.5 py-0.5 rounded-full bg-[#EAF4E6] text-[#154A24] font-bold uppercase">
+                                  {p.type}
+                                </span>
+                                <span className="font-mono font-bold text-[#144721]">
+                                  {p.programmeCode}
+                                </span>
+                                <span className="font-semibold text-[#8E6212]">
+                                  · {p.operationalStatus}
+                                </span>
+                              </div>
+                              <h3 className="text-lg sm:text-xl font-extrabold text-[#114720]">
+                                {lang === 'hi' ? p.titleHi || p.titleEn : p.titleEn}
+                              </h3>
+                              <p className="text-xs sm:text-sm text-[#395040] leading-relaxed">
+                                {lang === 'hi' ? p.summaryHi || p.summaryEn : p.summaryEn}
+                              </p>
+                              <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+                                <span className="text-xs font-semibold text-[#4B6353] inline-flex items-center gap-1.5">
+                                  <MapPin className="w-3.5 h-3.5 text-[#368737]" />
+                                  {p.coverageScope === 'india-wide'
+                                    ? `India-Wide (${p.locations.map((l) => l.district).join(', ')})`
+                                    : p.locations
+                                        .map((l) =>
+                                          l.localityName
+                                            ? `${l.localityName}, ${l.district} (${l.stateName})`
+                                            : `${l.district}, ${l.stateName}`
+                                        )
+                                        .join(' · ')}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => onNavigate(regUrl)}
+                                  className="inline-flex items-center gap-1.5 rounded-xl bg-[#154A24] hover:bg-[#0E3619] text-white px-4 py-2 text-xs font-bold cursor-pointer"
+                                >
+                                  <span>{lang === 'hi' ? 'सहभागिता दर्ज करें' : 'Join / Register'}</span>
+                                  <ArrowRight className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Nested Child Campaigns / Events / Trainings */}
+                          {root.children.length > 0 && (
+                            <div className="border-t border-[#E6DFCE] bg-white/80 px-5 sm:px-6 py-4 space-y-2.5">
+                              <p className="text-[11px] font-bold uppercase tracking-wider text-[#5A7B3B]">
+                                {lang === 'hi'
+                                  ? `इस परियोजना के अंतर्गत सक्रिय अभियान व गतिविधियाँ (${root.children.length})`
+                                  : `Nested Campaigns & Field Activities (${root.children.length})`}
+                              </p>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                {root.children.map((ch) => {
+                                  const cp = ch.item;
+                                  const cRegUrl = `/join/${encodeURIComponent(
+                                    cp.linkedFormType || 'volunteer'
+                                  )}?campaign=${encodeURIComponent(
+                                    cp.programmeCode
+                                  )}&campaignTitle=${encodeURIComponent(
+                                    cp.titleEn
+                                  )}&district=${encodeURIComponent(
+                                    cp.locations[0]?.district || firstDistrict
+                                  )}`;
+                                  return (
+                                    <div
+                                      key={cp.id}
+                                      className="rounded-2xl border border-[#E5DEC8] bg-[#FBFAF6] p-3.5 space-y-1.5"
+                                    >
+                                      <div className="flex items-center justify-between gap-2 text-[10.5px]">
+                                        <span className="font-bold uppercase text-[#154A24]">
+                                          {cp.type} · {cp.programmeCode}
+                                        </span>
+                                        <span className="font-semibold text-[#8E6212]">
+                                          {cp.operationalStatus}
+                                        </span>
+                                      </div>
+                                      <h4 className="text-sm font-bold text-[#114720]">
+                                        {lang === 'hi' ? cp.titleHi || cp.titleEn : cp.titleEn}
+                                      </h4>
+                                      {ch.children.length > 0 && (
+                                        <p className="text-[11px] text-[#368737] font-semibold">
+                                          +{ch.children.length}{' '}
+                                          {lang === 'hi' ? 'संलग्न कार्यक्रम/प्रशिक्षण' : 'scheduled activities/trainings'}
+                                        </p>
+                                      )}
+                                      <button
+                                        type="button"
+                                        onClick={() => onNavigate(cRegUrl)}
+                                        className="inline-flex items-center gap-1 text-xs font-bold text-[#154A24] hover:underline cursor-pointer pt-0.5"
+                                      >
+                                        <span>{lang === 'hi' ? 'अभी जुड़ें' : 'Participate Now'}</span>
+                                        <ArrowRight className="w-3 h-3" />
+                                      </button>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
               {/* Live Location Campaigns & Admin-Defined Participation Roles */}
               {feed.campaigns.length > 0 && (
                 <div className="space-y-4">

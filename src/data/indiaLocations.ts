@@ -371,55 +371,207 @@ export const INDIA_STATES_DIRECTORY: IndiaStateDirectory[] = [
   },
 ];
 
-// Preset Tehsil/City -> Kasba/Village clusters for Rajasthan Phase-1 Focus Districts
-// Additional Tehsils, Cities, Kasbas & Villages added in Admin automatically merge into these dropdowns!
-export const PRESET_SUBDISTRICTS: Record<string, { name: string; villages: string[] }[]> = {
+// Preset City / Tehsil / Block -> Gram Panchayat / Village / Municipal Ward clusters
+// Additional Cities, Tehsils, Grams & Wards added in Admin automatically merge into these dropdowns!
+export interface SubDistrictLocationGroup {
+  name: string;
+  villages: string[];
+}
+
+export const PRESET_SUBDISTRICTS: Record<string, SubDistrictLocationGroup[]> = {
   Bhilwara: [
-    { name: 'Bhilwara City / Suwana', villages: ['Bhilwara Urban', 'Suwana', 'Hamirgarh', 'Pur', 'Sanganer'] },
-    { name: 'Mandalgarh', villages: ['Mandalgarh Kasba', 'Bijoliya', 'Kachhola', 'Shyampura', 'Triveni'] },
-    { name: 'Mandal', villages: ['Mandal', 'Bagor', 'Bhadali Khera', 'Meja'] },
-    { name: 'Asind', villages: ['Asind', 'Badnor', 'Shambhugarh', 'Kareda'] },
-    { name: 'Sahada / Gangapur', villages: ['Gangapur', 'Raipur', 'Potlan', 'Koshithal'] },
+    { name: 'Bhilwara City / Suwana', villages: ['Azad Chowk Market & Pratap Nagar', 'Ward 1–10 Urban Green Belt', 'Suwana', 'Hamirgarh', 'Pur', 'Sanganer', 'Biliya'] },
+    { name: 'Mandalgarh', villages: ['Mandalgarh Kasba', 'Bigod', 'Bijoliya', 'Kachhola', 'Shyampura', 'Triveni', 'Mandalgarh Gram Panchayat Cluster'] },
+    { name: 'Mandal', villages: ['Mandal', 'Bagor', 'Bhadali Khera', 'Meja', 'Bhagwanpura'] },
+    { name: 'Asind', villages: ['Asind', 'Badnor', 'Shambhugarh', 'Kareda', 'Antali'] },
+    { name: 'Sahada / Gangapur', villages: ['Gangapur', 'Raipur', 'Potlan', 'Koshithal', 'Sahada'] },
+    { name: 'Jahazpur', villages: ['Jahazpur Kasba', 'Pander', 'Piplund', 'Luhari Kalan'] },
+    { name: 'Kotri', villages: ['Kotri', 'Banera', 'Sawai Pur', 'Paroli'] },
+  ],
+  Shahpura: [
+    { name: 'Shahpura City', villages: ['Shahpura Ward 1–10', 'Shahpura Rural Block', 'Phuliya Kalan', 'Dhikola'] },
+    { name: 'Jahazpur / Kotri Belt', villages: ['Khamor', 'Dhanop', 'Borda'] },
   ],
   Churu: [
-    { name: 'Sardarshahar', villages: ['Thathawata', 'Gharsisar', 'Sardarshahar Kasba', 'Bhanipura', 'Bidasar Road', 'Malsar'] },
-    { name: 'Churu Tehsil', villages: ['Churu City', 'Ratan Nagar', 'Dudhwakhara', 'Khasoli'] },
-    { name: 'Ratangarh', villages: ['Ratangarh', 'Rajaldesar', 'Loha', 'Parihara'] },
-    { name: 'Sujangarh', villages: ['Sujangarh', 'Salasar', 'Bidasar', 'Chhapar'] },
-    { name: 'Taranagar', villages: ['Taranagar', 'Sahawa', 'Bhaleri'] },
+    { name: 'Sardarshahar', villages: ['Thathawata', 'Sardarshahar Ward 4', 'Gharsisar', 'Sardarshahar Kasba', 'Bhanipura', 'Bidasar Road', 'Malsar', 'Bhojasar'] },
+    { name: 'Churu City / Tehsil', villages: ['Churu Urban Ward 1–15', 'Ratan Nagar', 'Dudhwakhara', 'Khasoli', 'Satyun'] },
+    { name: 'Ratangarh', villages: ['Ratangarh City', 'Rajaldesar', 'Loha', 'Parihara', 'Tidiyasar'] },
+    { name: 'Sujangarh', villages: ['Sujangarh City', 'Salasar', 'Bidasar', 'Chhapar', 'Sandwa'] },
+    { name: 'Taranagar', villages: ['Taranagar Kasba', 'Sahawa', 'Bhaleri', 'Bhalau'] },
+    { name: 'Rajgarh / Sadulpur', villages: ['Sadulpur City', 'Sidhmukh', 'Hameerwas', 'Sankhoo'] },
   ],
   Bikaner: [
-    { name: 'Bikaner City', villages: ['Bikaner Urban', 'Deshnoke', 'Napasar', 'Udasar'] },
-    { name: 'Nokha', villages: ['Nokha Mandi', 'Jasrasar', 'Panchu', 'Sovaniya'] },
-    { name: 'Lunkaransar', villages: ['Lunkaransar', 'Mahajan', 'Kalu'] },
-    { name: 'Kolayat', villages: ['Kolayat', 'Gajner', 'Bajaj Nagar', 'Bajju'] },
-    { name: 'Sri Dungargarh', villages: ['Sri Dungargarh', 'Sheruna', 'Bigha'] },
+    { name: 'Bikaner City', villages: ['Bikaner Urban Ward 1–20', 'Deshnoke', 'Napasar', 'Udasar', 'Ganga Shahar', 'Ridmalsar'] },
+    { name: 'Nokha', villages: ['Nokha Mandi', 'Jasrasar', 'Panchu', 'Sovaniya', 'Himmatsar'] },
+    { name: 'Lunkaransar', villages: ['Lunkaransar Kasba', 'Mahajan', 'Kalu', 'Khinyeera'] },
+    { name: 'Kolayat', villages: ['Kolayat', 'Gajner', 'Bajaj Nagar', 'Bajju', 'Hadda'] },
+    { name: 'Sri Dungargarh', villages: ['Sri Dungargarh City', 'Sheruna', 'Bigha', 'Soodsar'] },
+    { name: 'Khajuwala', villages: ['Khajuwala Mandi', 'Chhatargarh', 'Pugal', 'Dantor'] },
   ],
   Phalodi: [
-    { name: 'Phalodi Tehsil', villages: ['Phalodi Kasba', 'Khichan', 'Lohawat', 'Baap', 'Malar'] },
-    { name: 'Lohawat', villages: ['Lohawat', 'Peelwa', 'Jamba', 'Dechu'] },
-    { name: 'Bap', villages: ['Bap', 'Ghatiyali', 'Bhadla'] },
-    { name: 'Aau', villages: ['Aau', 'Chadi', 'Ishru'] },
+    { name: 'Phalodi City / Tehsil', villages: ['Phalodi Kasba Ward 1–10', 'Khichan', 'Malar', 'Bhojasar', 'Kundal'] },
+    { name: 'Lohawat', villages: ['Lohawat', 'Peelwa', 'Jamba', 'Dechu', 'Chhila'] },
+    { name: 'Bap', villages: ['Bap Kasba', 'Ghatiyali', 'Bhadla', 'Shekhasar'] },
+    { name: 'Aau', villages: ['Aau', 'Chadi', 'Ishru', 'Dhadhu'] },
+    { name: 'Setrawa / Bapini', villages: ['Bapini', 'Setrawa', 'Matora'] },
   ],
   Jodhpur: [
-    { name: 'Jodhpur / Mandore', villages: ['Jodhpur City', 'Mandore', 'Banar', 'Daijar', 'Salawas'] },
-    { name: 'Osian', villages: ['Osian', 'Tinwari', 'Mathania', 'Khetasar'] },
-    { name: 'Bilara', villages: ['Bilara', 'Pipar City', 'Borunda', 'Bhopalgarh'] },
-    { name: 'Luni', villages: ['Luni', 'Dhawa', 'Jhanwar', 'Kudi Bhagtasni'] },
+    { name: 'Jodhpur City / Mandore', villages: ['Jodhpur Urban Ward 1–25', 'Mandore School Cluster', 'Mandore', 'Banar', 'Daijar', 'Salawas', 'Kudi Bhagtasni'] },
+    { name: 'Osian', villages: ['Osian Kasba', 'Tinwari', 'Mathania', 'Khetasar', 'Cherai'] },
+    { name: 'Bilara', villages: ['Bilara City', 'Pipar City', 'Borunda', 'Bhopalgarh', 'Khejarla'] },
+    { name: 'Luni', villages: ['Luni', 'Dhawa', 'Jhanwar', 'Khejarli', 'Guda Bishnoiyan'] },
+    { name: 'Shergarh', villages: ['Shergarh', 'Balesar', 'Tena', 'Somesar'] },
   ],
   Jaipur: [
-    { name: 'Jaipur City', villages: ['Jaipur Urban', 'Sanganer', 'Amber', 'Bassi', 'Chomu'] },
-    { name: 'Chomu', villages: ['Chomu', 'Samod', 'Govindgarh'] },
+    { name: 'Jaipur City', villages: ['Jaipur Municipal Ward 1–25', 'Sanganer', 'Amber', 'Jhotwara', 'Mansarovar'] },
+    { name: 'Chomu', villages: ['Chomu City', 'Samod', 'Govindgarh', 'Kaladera'] },
+    { name: 'Bassi', villages: ['Bassi', 'Toonga', 'Kanota', 'Jatwara'] },
+    { name: 'Chaksu', villages: ['Chaksu Kasba', 'Kotkhawda', 'Shivdaspura'] },
   ],
   Sikar: [
-    { name: 'Sikar Tehsil', villages: ['Sikar City', 'Piprali', 'Dhod', 'Laxmangarh', 'Fatehpur'] },
-    { name: 'Neem Ka Thana / Khandela', villages: ['Khandela', 'Sri Madhopur', 'Reengus'] },
+    { name: 'Sikar City / Tehsil', villages: ['Sikar Urban Ward 1–15', 'Piprali', 'Dhod', 'Katrathal'] },
+    { name: 'Fatehpur / Laxmangarh', villages: ['Fatehpur Shekhawati', 'Laxmangarh', 'Ramgarh Shekhawati'] },
+    { name: 'Danta Ramgarh / Khatu', villages: ['Khatu Shyamji', 'Danta', 'Palsana', 'Reengus'] },
+  ],
+  Ajmer: [
+    { name: 'Ajmer City', villages: ['Ajmer Ward 1–20', 'Pushkar', 'Gegal', 'Makhupura'] },
+    { name: 'Kishangarh', villages: ['Kishangarh City', 'Roopangarh', 'Harmara', 'Sursura'] },
+    { name: 'Nasirabad', villages: ['Nasirabad', 'Srinagar', 'Bhinai'] },
+  ],
+  Udaipur: [
+    { name: 'Udaipur City / Girwa', villages: ['Udaipur Urban Ward 1–20', 'Badgaon', 'Debari', 'Bhuwana'] },
+    { name: 'Mavli', villages: ['Mavli', 'Dabok', 'Fatehnagar', 'Sanwar'] },
+    { name: 'Gogunda / Vallabhnagar', villages: ['Gogunda', 'Vallabhnagar', 'Bhinder', 'Kanore'] },
+  ],
+  Kota: [
+    { name: 'Kota City / Ladpura', villages: ['Kota Urban Ward 1–20', 'Kaithoon', 'Mandana', 'Rangbari'] },
+    { name: 'Ramganj Mandi', villages: ['Ramganj Mandi', 'Chechat', 'Modak'] },
+    { name: 'Sangod / Pipalda', villages: ['Sangod', 'Itawa', 'Sultanpur'] },
+  ],
+  Alwar: [
+    { name: 'Alwar City', villages: ['Alwar Urban Ward 1–15', 'Malakhera', 'Umrain', 'Ramgarh'] },
+    { name: 'Rajgarh / Thanagazi', villages: ['Rajgarh', 'Thanagazi', 'Pratapgarh'] },
+  ],
+  Nagaur: [
+    { name: 'Nagaur City', villages: ['Nagaur Ward 1–15', 'Mundwa', 'Khinwsar', 'Jayal'] },
+    { name: 'Merta City', villages: ['Merta City', 'Merta Road', 'Degana', 'Riyan Badi'] },
+  ],
+  Pali: [
+    { name: 'Pali City', villages: ['Pali Urban Ward 1–15', 'Rohat', 'Sojat', 'Marwar Junction'] },
+    { name: 'Sumerpur / Bali', villages: ['Sumerpur', 'Falna', 'Bali', 'Desuri'] },
+  ],
+  Jhunjhunu: [
+    { name: 'Jhunjhunu City', villages: ['Jhunjhunu Urban Ward 1–15', 'Mandawa', 'Baggar', 'Bissau'] },
+    { name: 'Nawalgarh / Pilani', villages: ['Nawalgarh', 'Pilani', 'Chirawa', 'Surajgarh'] },
+  ],
+  Hanumangarh: [
+    { name: 'Hanumangarh Junction & Town', villages: ['Hanumangarh Urban Ward 1–15', 'Tibbi', 'Pilibanga'] },
+    { name: 'Nohar / Bhadra', villages: ['Nohar', 'Bhadra', 'Rawatsar', 'Sangaria'] },
+  ],
+  'Sri Ganganagar': [
+    { name: 'Sri Ganganagar City', villages: ['Sri Ganganagar Ward 1–15', 'Sadulshahar', 'Padampur'] },
+    { name: 'Suratgarh / Raisinghnagar', villages: ['Suratgarh', 'Raisinghnagar', 'Sri Karanpur'] },
+  ],
+  Chittorgarh: [
+    { name: 'Chittorgarh City', villages: ['Chittorgarh Urban Ward 1–15', 'Bassi', 'Gangrar'] },
+    { name: 'Nimbahera / Kapasan', villages: ['Nimbahera', 'Kapasan', 'Begun', 'Rawatbhata'] },
   ],
   Kutch: [
-    { name: 'Bhuj', villages: ['Bhuj City', 'Madhapar', 'Mirzapar', 'Kukma'] },
-    { name: 'Anjar / Gandhidham', villages: ['Anjar', 'Gandhidham', 'Adipur'] },
+    { name: 'Bhuj', villages: ['Bhuj City Ward 1–10', 'Madhapar', 'Mirzapar', 'Kukma'] },
+    { name: 'Anjar / Gandhidham', villages: ['Anjar', 'Gandhidham', 'Adipur', 'Mundra'] },
+  ],
+  Ahmedabad: [
+    { name: 'Ahmedabad City', villages: ['Navrangpura Ward', 'Bopal', 'Sanand', 'Dholka'] },
+    { name: 'Daskroi / Viramgam', villages: ['Daskroi', 'Viramgam', 'Bavla'] },
+  ],
+  Indore: [
+    { name: 'Indore City', villages: ['Indore Municipal Ward 1–15', 'Rau', 'Mhow', 'Sanwer'] },
+    { name: 'Depalpur', villages: ['Depalpur', 'Betma', 'Gautampura'] },
+  ],
+  Lucknow: [
+    { name: 'Lucknow City', villages: ['Gomti Nagar Ward', 'Alambagh', 'Bakshi Ka Talab', 'Mohanlalganj'] },
+    { name: 'Malihabad', villages: ['Malihabad', 'Kakori', 'Rahimabad'] },
+  ],
+  Shimla: [
+    { name: 'Shimla City', villages: ['Shimla Municipal Ward 1–10', 'Mashobra', 'Kufri', 'Sanjauli'] },
+    { name: 'Theog / Rohru', villages: ['Theog', 'Kotkhai', 'Rohru', 'Jubbal'] },
   ],
 };
+
+/**
+ * Returns cascading City / Tehsil -> Grams & Wards groups for any Indian district.
+ * Automatically merges curated presets with any custom Admin-defined cities/villages,
+ * and falls back gracefully so every district offers selectable City/Block + Gram/Ward options.
+ */
+export function getCitiesAndGramsForDistrict(
+  districtName: string,
+  extraCities: string[] = [],
+  extraLocalities: string[] = []
+): SubDistrictLocationGroup[] {
+  const cleanDistrict = districtName.trim();
+  if (!cleanDistrict) return [];
+
+  const presetKey = Object.keys(PRESET_SUBDISTRICTS).find(
+    (k) => k.toLowerCase() === cleanDistrict.toLowerCase()
+  );
+
+  const map = new Map<string, Set<string>>();
+
+  if (presetKey) {
+    for (const grp of PRESET_SUBDISTRICTS[presetKey]) {
+      map.set(grp.name, new Set(grp.villages));
+    }
+  } else {
+    // Graceful universal structure for any of India's 700+ districts not yet detailed in presets
+    map.set(
+      `${cleanDistrict} City / Municipal Area`,
+      new Set([
+        `${cleanDistrict} Urban Ward 1–5`,
+        `${cleanDistrict} Urban Ward 6–10`,
+        `${cleanDistrict} Town Market Area`,
+      ])
+    );
+    map.set(
+      `${cleanDistrict} Rural Tehsil / Block`,
+      new Set([
+        `${cleanDistrict} Gram Panchayat Cluster`,
+        `${cleanDistrict} Rural Village Belt`,
+      ])
+    );
+  }
+
+  for (const c of extraCities) {
+    const trimmed = c.trim();
+    if (!trimmed) continue;
+    const existingKey = Array.from(map.keys()).find(
+      (k) => k.toLowerCase() === trimmed.toLowerCase()
+    );
+    if (!existingKey) {
+      map.set(trimmed, new Set([`${trimmed} Town / Ward`, `${trimmed} Gram Panchayat`]));
+    }
+  }
+
+  // Merge any extra admin-assigned localities into a matching city or the first city group
+  const firstKey = Array.from(map.keys())[0];
+  for (const loc of extraLocalities) {
+    const trimmed = loc.trim();
+    if (!trimmed) continue;
+    const matchedCity = Array.from(map.keys()).find((cityKey) => {
+      const ck = cityKey.toLowerCase();
+      const lt = trimmed.toLowerCase();
+      return lt.includes(ck) || ck.includes(lt);
+    });
+    const targetKey = matchedCity ?? firstKey;
+    if (targetKey) {
+      map.get(targetKey)?.add(trimmed);
+    }
+  }
+
+  return Array.from(map.entries()).map(([name, set]) => ({
+    name,
+    villages: Array.from(set),
+  }));
+}
 
 export const ADVISORY_DOMAIN_CATEGORIES = [
   {

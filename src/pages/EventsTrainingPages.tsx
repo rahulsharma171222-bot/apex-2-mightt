@@ -23,6 +23,7 @@ import { RegistrationPortal } from '../components/RegistrationForms';
 import { TRAINING_ARTICLES, MARATHON_INFO, MAGAZINE_INFO } from '../data/siteContent';
 import { usePublicPortal } from '../context/PublicPortalContext';
 import { getMarathonCountdown } from '../utils/govedaLogic';
+import { filterUnifiedProgrammes } from '../utils/adminLogic';
 import type { Language, RegistrationRecord } from '../types/goveda';
 
 interface TrainingPageProps {
@@ -44,6 +45,10 @@ export function TrainingPage({
   const adminCourses = (bootstrap?.contentItems ?? []).filter(
     (item) => item.status === 'Published' && item.sectionType === 'training'
   );
+  const unifiedTrainings = filterUnifiedProgrammes(bootstrap?.programmes ?? [], {
+    type: 'training',
+    onlyPublished: true,
+  });
 
   const handleListen = (id: string, text: string) => {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
@@ -104,6 +109,74 @@ export function TrainingPage({
             </div>
           ))}
         </div>
+
+        {/* Live Unified Training Programmes from Central Hub */}
+        {unifiedTrainings.length > 0 && (
+          <section className="space-y-4">
+            <h2 className="text-xl font-bold text-[#144527]">
+              {lang === 'hi'
+                ? 'सक्रिय क्षेत्रीय प्रशिक्षण कार्यक्रम (Central Hub)'
+                : 'Active Field Training Programmes'}
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {unifiedTrainings.map((tr) => {
+                const firstDistrict = tr.locations[0]?.district || 'Bhilwara';
+                const joinUrl = `/join/${encodeURIComponent(
+                  tr.linkedFormType || 'skill-training'
+                )}?campaign=${encodeURIComponent(tr.programmeCode)}&campaignTitle=${encodeURIComponent(
+                  tr.titleEn
+                )}&district=${encodeURIComponent(firstDistrict)}`;
+                return (
+                  <article
+                    key={tr.id}
+                    className="rounded-2xl border border-[#479D27]/25 bg-[#F4F8F3] p-6 flex flex-col justify-between gap-4"
+                  >
+                    <div className="space-y-2">
+                      <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+                        <span className="font-mono font-bold text-[#368737]">
+                          {tr.programmeCode}
+                        </span>
+                        <span className="px-2.5 py-0.5 rounded-md bg-white border border-[#1B5A32]/15 font-semibold text-[#144527]">
+                          {tr.operationalStatus}
+                        </span>
+                      </div>
+                      <h3 className="text-lg font-bold text-[#144527]">
+                        {lang === 'hi' ? tr.titleHi || tr.titleEn : tr.titleEn}
+                      </h3>
+                      <p className="text-sm text-[#2A3A30] leading-relaxed">
+                        {lang === 'hi' ? tr.summaryHi || tr.summaryEn : tr.summaryEn}
+                      </p>
+                      <div className="flex flex-wrap items-center gap-3 text-xs text-[#44544A] pt-1">
+                        {tr.locations.length > 0 && (
+                          <span className="inline-flex items-center gap-1">
+                            <MapPin className="w-3.5 h-3.5 text-[#368737]" />
+                            {tr.locations.map((l) => `${l.district}, ${l.stateName}`).join(' · ')}
+                          </span>
+                        )}
+                        {tr.startDate && (
+                          <span className="inline-flex items-center gap-1 font-mono">
+                            <Calendar className="w-3.5 h-3.5 text-[#368737]" />
+                            {tr.startDate}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex justify-end">
+                      <SpringButton
+                        variant="primary"
+                        size="sm"
+                        onClick={() => onNavigate(joinUrl)}
+                      >
+                        <span>{lang === 'hi' ? 'प्रशिक्षण पंजीकरण' : 'Register for Training'}</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </SpringButton>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          </section>
+        )}
 
         {/* Live Admin-Published Courses & Training Modules */}
         {adminCourses.length > 0 && (
@@ -316,6 +389,10 @@ export function EventsPage({ lang, onNavigate }: EventsPageProps) {
   const { bootstrap } = usePublicPortal();
   const liveEvents = bootstrap?.marathonEvents ?? [];
   const featuredEvent = liveEvents[0];
+  const unifiedEvents = filterUnifiedProgrammes(bootstrap?.programmes ?? [], {
+    type: 'event',
+    onlyPublished: true,
+  });
   const publishedMedia = (bootstrap?.contentItems ?? []).filter(
     (c) => c.status === 'Published' && (c.sectionType === 'news' || c.sectionType === 'gallery')
   );
@@ -421,6 +498,74 @@ export function EventsPage({ lang, onNavigate }: EventsPageProps) {
                   </p>
                 </div>
               ))}
+            </div>
+          </section>
+        )}
+
+        {/* Live Unified Field Events & Activities from Central Hub */}
+        {unifiedEvents.length > 0 && (
+          <section className="space-y-4">
+            <h2 className="text-xl font-bold text-[#144527]">
+              {lang === 'hi'
+                ? 'सक्रिय क्षेत्रीय आयोजन एवं अभियान गतिविधियाँ'
+                : 'Live Field Events & Campaign Activities'}
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {unifiedEvents.map((ev) => {
+                const firstDistrict = ev.locations[0]?.district || 'Bhilwara';
+                const joinUrl = `/join/${encodeURIComponent(
+                  ev.linkedFormType || 'volunteer'
+                )}?campaign=${encodeURIComponent(ev.programmeCode)}&campaignTitle=${encodeURIComponent(
+                  ev.titleEn
+                )}&district=${encodeURIComponent(firstDistrict)}`;
+                return (
+                  <div
+                    key={ev.id}
+                    className="rounded-2xl border border-[#1B5A32]/15 bg-[#F4F8F3] p-5 flex flex-col justify-between gap-3"
+                  >
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-xs text-[#368737] font-semibold">
+                        <span className="font-mono">{ev.programmeCode}</span>
+                        <span>{ev.operationalStatus}</span>
+                      </div>
+                      <h3 className="text-base font-bold text-[#144527]">
+                        {lang === 'hi' ? ev.titleHi || ev.titleEn : ev.titleEn}
+                      </h3>
+                      <p className="text-xs text-[#2A3A30] leading-relaxed">
+                        {lang === 'hi' ? ev.summaryHi || ev.summaryEn : ev.summaryEn}
+                      </p>
+                      <div className="flex flex-wrap items-center gap-3 text-xs text-[#44544A]">
+                        {ev.locations.length > 0 && (
+                          <span className="inline-flex items-center gap-1">
+                            <MapPin className="w-3.5 h-3.5 text-[#368737]" />
+                            {ev.locations
+                              .map((l) =>
+                                l.localityName ? `${l.localityName}, ${l.district}` : l.district
+                              )
+                              .join(' · ')}
+                          </span>
+                        )}
+                        {ev.startDate && (
+                          <span className="inline-flex items-center gap-1 font-mono">
+                            <Calendar className="w-3.5 h-3.5 text-[#368737]" />
+                            {ev.startDate}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex justify-end">
+                      <SpringButton
+                        variant="primary"
+                        size="sm"
+                        onClick={() => onNavigate(joinUrl)}
+                      >
+                        <span>{lang === 'hi' ? 'सहभागी बनें' : 'Register for Activity'}</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </SpringButton>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </section>
         )}

@@ -4,10 +4,15 @@ import { DISTRICTS_DATA } from '../data/districtsData';
 import type { DistrictData } from '../types/goveda';
 
 export interface MergedPublicDistrict extends DistrictData {
+  stateSlug?: string;
+  stateNameEn?: string;
+  stateNameHi?: string;
   coordinatorName: string;
   outreachNotes: string;
   progressNotesHi: string;
   progressNotesEn: string;
+  subDistricts: string[];
+  villages: string[];
   galleryUrls: string[];
   outreachItems: DistrictOutreachItemSpec[];
   displayOrder: number;
@@ -29,10 +34,15 @@ export function mergePublicDistricts(
   if (!liveDistricts || liveDistricts.length === 0) {
     return DISTRICTS_DATA.map((d, idx) => ({
       ...d,
+      stateSlug: 'rajasthan',
+      stateNameEn: 'Rajasthan',
+      stateNameHi: 'राजस्थान',
       coordinatorName: '',
       outreachNotes: '',
       progressNotesHi: '',
       progressNotesEn: '',
+      subDistricts: [],
+      villages: [],
       galleryUrls: [],
       outreachItems: [],
       displayOrder: idx + 1,
@@ -48,6 +58,9 @@ export function mergePublicDistricts(
       if (base) {
         return {
           ...base,
+          stateSlug: live.stateSlug || 'rajasthan',
+          stateNameEn: live.stateNameEn || 'Rajasthan',
+          stateNameHi: live.stateNameHi || 'राजस्थान',
           name: {
             hi: live.nameHi || base.name.hi,
             en: live.nameEn || base.name.en,
@@ -64,6 +77,8 @@ export function mergePublicDistricts(
           outreachNotes: live.outreachNotes || '',
           progressNotesHi: live.progressNotesHi || '',
           progressNotesEn: live.progressNotesEn || '',
+          subDistricts: Array.isArray(live.subDistricts) ? live.subDistricts : [],
+          villages: Array.isArray(live.villages) ? live.villages : [],
           galleryUrls: Array.isArray(live.galleryUrls) ? live.galleryUrls : [],
           outreachItems: Array.isArray(live.outreachItems) ? live.outreachItems : [],
           displayOrder: live.displayOrder,
@@ -74,6 +89,9 @@ export function mergePublicDistricts(
       extraIdx += 1;
       return {
         slug: live.slug,
+        stateSlug: live.stateSlug || 'rajasthan',
+        stateNameEn: live.stateNameEn || 'Rajasthan',
+        stateNameHi: live.stateNameHi || 'राजस्थान',
         name: { hi: live.nameHi || live.nameEn, en: live.nameEn || live.nameHi },
         regionTag: {
           hi: live.regionTagHi || 'हरित राजस्थान विस्तारित जिला',
@@ -113,6 +131,8 @@ export function mergePublicDistricts(
         outreachNotes: live.outreachNotes || '',
         progressNotesHi: live.progressNotesHi || '',
         progressNotesEn: live.progressNotesEn || '',
+        subDistricts: Array.isArray(live.subDistricts) ? live.subDistricts : [],
+        villages: Array.isArray(live.villages) ? live.villages : [],
         galleryUrls: Array.isArray(live.galleryUrls) ? live.galleryUrls : [],
         outreachItems: Array.isArray(live.outreachItems) ? live.outreachItems : [],
         displayOrder: live.displayOrder,

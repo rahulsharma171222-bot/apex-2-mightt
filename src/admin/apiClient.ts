@@ -1,5 +1,6 @@
 import type {
   AdminAuditLog,
+  AdminBlueprintPayload,
   AdminCampaignRecord,
   AdminContentItem,
   AdminCsrProposal,
@@ -15,8 +16,15 @@ import type {
   AdminSiteGovernance,
   AdminSubmissionRecord,
   AdminTeamMember,
+  FounderMessageConfig,
   HaritMitraNetworkNode,
+  HomepageSectionConfig,
+  MissionAdminConfig,
   PublicBootstrapPayload,
+  StaticPageRecord,
+  UnifiedProgrammeRecord,
+  WasteActivityRecord,
+  WastePartnerRecord,
 } from './types';
 import type { AdminRole, SubmissionStatus, TimeframeKey } from '../utils/adminLogic';
 
@@ -33,6 +41,34 @@ export class ApiError extends Error {
   }
 }
 
+function getAdminAuthHeaders(): Record<string, string> {
+  try {
+    if (typeof window === 'undefined') return {};
+    const directToken =
+      window.localStorage.getItem('goveda_admin_token') ||
+      window.sessionStorage.getItem('goveda_admin_token');
+    if (directToken && directToken.trim()) {
+      return { Authorization: `Bearer ${directToken.trim()}` };
+    }
+    // Automatically pick up Supabase Auth session access token if present
+    for (let i = 0; i < window.localStorage.length; i++) {
+      const k = window.localStorage.key(i);
+      if (k && k.startsWith('sb-') && k.endsWith('-auth-token')) {
+        const raw = window.localStorage.getItem(k);
+        if (!raw) continue;
+        const parsed = JSON.parse(raw);
+        const token = parsed?.access_token || parsed?.currentSession?.access_token;
+        if (typeof token === 'string' && token.trim()) {
+          return { Authorization: `Bearer ${token.trim()}` };
+        }
+      }
+    }
+  } catch {
+    // Ignore storage read issues safely
+  }
+  return {};
+}
+
 async function requestJson<T>(
   url: string,
   options: {
@@ -43,6 +79,7 @@ async function requestJson<T>(
 ): Promise<T> {
   const headers: Record<string, string> = {
     Accept: 'application/json',
+    ...(options.authenticated ? getAdminAuthHeaders() : {}),
   };
 
   if (options.body !== undefined) {
@@ -259,7 +296,9 @@ export const adminApi = {
     if (params.dateTo) sp.set('dateTo', params.dateTo);
     if (params.q && params.q.trim()) sp.set('q', params.q.trim());
     const qs = sp.toString();
-    const response = await fetch(`/api/admin/submissions/export.csv${qs ? `?${qs}` : ''}`);
+    const response = await fetch(`/api/admin/submissions/export.csv${qs ? `?${qs}` : ''}`, {
+      headers: getAdminAuthHeaders(),
+    });
     if (!response.ok) {
       throw new ApiError('Unable to export CSV.', response.status);
     }
@@ -288,7 +327,9 @@ export const adminApi = {
     if (params.dateTo) sp.set('dateTo', params.dateTo);
     if (params.q && params.q.trim()) sp.set('q', params.q.trim());
     const qs = sp.toString();
-    const response = await fetch(`/api/admin/submissions/export.json${qs ? `?${qs}` : ''}`);
+    const response = await fetch(`/api/admin/submissions/export.json${qs ? `?${qs}` : ''}`, {
+      headers: getAdminAuthHeaders(),
+    });
     if (!response.ok) {
       throw new ApiError('Unable to download JSON backup.', response.status);
     }
@@ -346,7 +387,9 @@ export const adminApi = {
     if (params?.dateTo) sp.set('dateTo', params.dateTo);
     if (params?.q && params.q.trim()) sp.set('q', params.q.trim());
     const qs = sp.toString();
-    const response = await fetch(`/api/admin/payments/export.csv${qs ? `?${qs}` : ''}`);
+    const response = await fetch(`/api/admin/payments/export.csv${qs ? `?${qs}` : ''}`, {
+      headers: getAdminAuthHeaders(),
+    });
     if (!response.ok) {
       throw new ApiError('Unable to export payments CSV.', response.status);
     }
@@ -575,5 +618,112 @@ export const adminApi = {
     requestJson<{ logs: AdminAuditLog[] }>('/api/admin/audit-logs', {
       authenticated: true,
     }),
+
+  getBlueprint: () =>
+    requestJson<AdminBlueprintPayload>('/api/admin/blueprint', {
+      authenticated: true,
+    }),
+
+  saveHomepageSections: (sections: HomepageSectionConfig[]) =>
+    requestJson<{ homepageSections: HomepageSectionConfig[] }>(
+      '/api/admin/homepage-sections',
+      {
+        method: 'PUT',
+        body: { sections },
+        authenticated: true,
+      }
+    ),
+
+  saveStaticPage: (page: Partial<StaticPageRecord>) =>
+    requestJson<{ page: StaticPageRecord; staticPages: StaticPageRecord[] }>(
+      '/api/admin/pages',
+      {
+        method: 'POST',
+        body: page,
+        authenticated: true,
+      }
+    ),
+
+  deleteStaticPage: (id: string) =>
+    requestJson<{ deleted: boolean }>(`/api/admin/pages/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+      authenticated: true,
+    }),
+
+  saveMissionConfig: (slug: string, patch: Partial<MissionAdminConfig>) =>
+    requestJson<{ mission: MissionAdminConfig; missionConfigs: MissionAdminConfig[] }>(
+      `/api/admin/missions/${encodeURIComponent(slug)}`,
+      {
+        method: 'PUT',
+        body: patch,
+        authenticated: true,
+      }
+    ),
+
+  saveWasteRecord: (record: Partial<WasteActivityRecord>) =>
+    requestJson<{ record: WasteActivityRecord; wasteRecords: WasteActivityRecord[] }>(
+      '/api/admin/waste/records',
+      {
+        method: 'POST',
+        body: record,
+        authenticated: true,
+      }
+    ),
+
+  deleteWasteRecord: (id: string) =>
+    requestJson<{ deleted: boolean }>(
+      `/api/admin/waste/records/${encodeURIComponent(id)}`,
+      {
+        method: 'DELETE',
+        authenticated: true,
+      }
+    ),
+
+  saveWastePartner: (partner: Partial<WastePartnerRecord>) =>
+    requestJson<{ partner: WastePartnerRecord; wastePartners: WastePartnerRecord[] }>(
+      '/api/admin/waste/partners',
+      {
+        method: 'POST',
+        body: partner,
+        authenticated: true,
+      }
+    ),
+
+  deleteWastePartner: (id: string) =>
+    requestJson<{ deleted: boolean }>(
+      `/api/admin/waste/partners/${encodeURIComponent(id)}`,
+      {
+        method: 'DELETE',
+        authenticated: true,
+      }
+    ),
+
+  saveProgramme: (payload: Partial<UnifiedProgrammeRecord>) =>
+    requestJson<{
+      programme: UnifiedProgrammeRecord;
+      programmes: UnifiedProgrammeRecord[];
+    }>('/api/admin/programmes', {
+      method: 'POST',
+      body: payload,
+      authenticated: true,
+    }),
+
+  deleteProgramme: (id: string) =>
+    requestJson<{ deleted: boolean; programmes: UnifiedProgrammeRecord[] }>(
+      `/api/admin/programmes/${encodeURIComponent(id)}`,
+      {
+        method: 'DELETE',
+        authenticated: true,
+      }
+    ),
+
+  saveFounderMessage: (payload: Partial<FounderMessageConfig>) =>
+    requestJson<{ founderMessage: FounderMessageConfig }>('/api/admin/founder-message', {
+      method: 'PUT',
+      body: payload,
+      authenticated: true,
+    }),
 };
+
+
 

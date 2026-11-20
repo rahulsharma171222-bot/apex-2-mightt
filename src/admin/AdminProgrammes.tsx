@@ -17,6 +17,8 @@ import type {
   AdminImpactMetric,
   AdminMarathonEvent,
   AdminProjectRecord,
+  AdminSubmissionRecord,
+  UnifiedProgrammeRecord,
 } from './types';
 import type {
   DistrictOutreachItemSpec,
@@ -25,7 +27,7 @@ import type {
   RaceCategorySpec,
 } from '../db/schema';
 import type { AdminRole } from '../utils/adminLogic';
-import { formatBilingualIsoDate } from '../utils/adminLogic';
+import { filterUnifiedProgrammes, formatBilingualIsoDate } from '../utils/adminLogic';
 import { INDIA_STATES_DIRECTORY, findStateByNameOrSlug } from '../data/indiaLocations';
 
 type UploadMediaFn = (file: File) => Promise<{
@@ -842,6 +844,10 @@ export function AdminEventsView({
 interface AdminDistrictsViewProps {
   role: AdminRole;
   districts: AdminDistrictRecord[];
+  programmes?: UnifiedProgrammeRecord[];
+  submissions?: AdminSubmissionRecord[];
+  onOpenProgrammes?: () => void;
+  onOpenSubmissions?: () => void;
   onSaveDistrict: (d: Partial<AdminDistrictRecord>) => Promise<void>;
   onDeleteDistrict: (slug: string) => Promise<void>;
   onUploadMedia: UploadMediaFn;
@@ -850,13 +856,42 @@ interface AdminDistrictsViewProps {
 export function AdminDistrictsView({
   role,
   districts,
+  programmes = [],
+  submissions = [],
+  onOpenProgrammes,
+  onOpenSubmissions,
   onSaveDistrict,
   onDeleteDistrict,
   onUploadMedia,
 }: AdminDistrictsViewProps) {
   const [editing, setEditing] = useState<Partial<AdminDistrictRecord> | null>(null);
+  const [overviewSlug, setOverviewSlug] = useState<string>(districts[0]?.slug ?? 'bhilwara');
+  const [quickRajasthanDist, setQuickRajasthanDist] = useState<string>('');
   const [saving, setSaving] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+
+  const remainingRajasthanDistricts = (
+    INDIA_STATES_DIRECTORY.find((s) => s.slug === 'rajasthan')?.districts ?? []
+  ).filter(
+    (distName) =>
+      !districts.some((d) => d.nameEn.toLowerCase() === distName.toLowerCase())
+  );
+
+  const inspectedDistrict =
+    districts.find((d) => d.slug === overviewSlug) ?? districts[0] ?? null;
+
+  const inspectedProgrammes = inspectedDistrict
+    ? filterUnifiedProgrammes(programmes, {
+        stateName: inspectedDistrict.stateNameEn || 'Rajasthan',
+        district: inspectedDistrict.nameEn,
+      })
+    : [];
+
+  const inspectedSubmissionsCount = inspectedDistrict
+    ? submissions.filter(
+        (s) => s.district.toLowerCase() === inspectedDistrict.nameEn.toLowerCase()
+      ).length
+    : 0;
 
   const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -1345,6 +1380,17 @@ export function AdminDistrictsView({
                     <td className="py-3.5 px-5 text-right whitespace-nowrap space-x-2">
                       <button
                         type="button"
+                        onClick={() => setOverviewSlug(d.slug)}
+                        className={`px-3 py-1.5 rounded-lg border font-semibold cursor-pointer ${
+                          inspectedDistrict?.slug === d.slug
+                            ? 'bg-[#144527] text-white border-[#144527]'
+                            : 'border-[#DCE5DE] text-[#144527] hover:bg-[#EDF5EE]'
+                        }`}
+                      >
+                        Overview
+                      </button>
+                      <button
+                        type="button"
                         onClick={() => setEditing(d)}
                         className="px-3 py-1.5 rounded-lg border border-[#DCE5DE] text-[#144527] font-semibold hover:bg-[#EDF5EE] cursor-pointer"
                       >
@@ -1368,6 +1414,151 @@ export function AdminDistrictsView({
           </table>
         </div>
       </div>
+
+      {/* DISTRICT PROGRAMME OVERVIEW + QUICK ACTIVATE REMAINING RAJASTHAN DISTRICTS */}
+      {inspectedDistrict && (
+        <div className="bg-white rounded-2xl border border-[#E2EAE4] p-5 sm:p-6 space-y-5 text-xs">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#EDF2EE] pb-4">
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-wider text-[#2E7D32]">
+                District Programme Overview · {inspectedDistrict.stateNameEn || 'Rajasthan'}
+              </p>
+              <h3 className="text-base font-bold text-[#142119] mt-0.5">
+                {inspectedDistrict.nameEn} ({inspectedDistrict.nameHi}) — Linked Programmes &amp; Registrations
+              </h3>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              {onOpenProgrammes && (
+                <button
+                  type="button"
+                  onClick={onOpenProgrammes}
+                  className="px-3 py-1.5 rounded-xl bg-[#144527] text-white font-semibold hover:bg-[#0F351E] cursor-pointer"
+                >
+                  Manage in All Programmes
+                </button>
+              )}
+              {onOpenSubmissions && (
+                <button
+                  type="button"
+                  onClick={onOpenSubmissions}
+                  className="px-3 py-1.5 rounded-xl border border-[#DCE5DE] text-[#144527] font-semibold hover:bg-[#EDF5EE] cursor-pointer"
+                >
+                  View Registrations ({inspectedSubmissionsCount})
+                </button>
+              )}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+            {[
+              { label: 'Projects', value: inspectedProgrammes.filter((p) => p.type === 'project').length },
+              { label: 'Campaigns', value: inspectedProgrammes.filter((p) => p.type === 'campaign').length },
+              { label: 'Events', value: inspectedProgrammes.filter((p) => p.type === 'event').length },
+              { label: 'Training', value: inspectedProgrammes.filter((p) => p.type === 'training').length },
+              { label: 'Registrations', value: inspectedSubmissionsCount },
+            ].map((k) => (
+              <div key={k.label} className="rounded-xl bg-[#FAFBF8] border border-[#E2EAE4] p-3">
+                <p className="text-[11px] text-[#55685C]">{k.label}</p>
+                <p className="text-xl font-bold text-[#142119] mt-0.5 tabular-nums">{k.value}</p>
+              </div>
+            ))}
+          </div>
+
+          {inspectedProgrammes.length === 0 ? (
+            <p className="text-[#55685C]">
+              No linked projects, campaigns, or events are assigned to {inspectedDistrict.nameEn} yet. Create one in All Programmes &amp; assign this district.
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {inspectedProgrammes.map((prg) => (
+                <div
+                  key={prg.id}
+                  className="rounded-xl border border-[#E2EAE4] bg-[#FAFBF8] p-3.5 flex items-center justify-between gap-3"
+                >
+                  <div className="min-w-0">
+                    <p className="text-[10.5px] font-bold uppercase text-[#2E7D32]">
+                      {prg.type} · {prg.operationalStatus} · {prg.publicationStatus}
+                    </p>
+                    <p className="font-bold text-[#142119] truncate mt-0.5">{prg.titleEn}</p>
+                    <p className="text-[11px] text-[#55685C] font-mono">{prg.programmeCode}</p>
+                  </div>
+                  {onOpenProgrammes && (
+                    <button
+                      type="button"
+                      onClick={onOpenProgrammes}
+                      className="px-2.5 py-1 rounded-lg border border-[#DCE5DE] bg-white text-[#144527] font-semibold hover:bg-[#EDF5EE] shrink-0 cursor-pointer"
+                    >
+                      Edit
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {role === 'super_admin' && remainingRajasthanDistricts.length > 0 && (
+            <div className="pt-4 border-t border-[#EDF2EE] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <p className="font-bold text-[#142119]">
+                  Quick Activate Another Rajasthan District ({remainingRajasthanDistricts.length} remaining of 48)
+                </p>
+                <p className="text-[11px] text-[#55685C]">
+                  Pre-fills a new Rajasthan district hub ready for Harit Rajasthan activation.
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <select
+                  value={quickRajasthanDist}
+                  onChange={(e) => setQuickRajasthanDist(e.target.value)}
+                  className="rounded-xl border border-[#DCE5DE] bg-white px-3 py-1.5 text-xs"
+                >
+                  <option value="">Choose Rajasthan District...</option>
+                  {remainingRajasthanDistricts.map((distName) => (
+                    <option key={distName} value={distName}>
+                      {distName}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  disabled={!quickRajasthanDist}
+                  onClick={() => {
+                    if (!quickRajasthanDist) return;
+                    setEditing({
+                      slug: quickRajasthanDist.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+                      stateSlug: 'rajasthan',
+                      stateNameEn: 'Rajasthan',
+                      stateNameHi: 'राजस्थान',
+                      nameEn: quickRajasthanDist,
+                      nameHi: quickRajasthanDist,
+                      regionTagEn: 'Harit Rajasthan Expansion District',
+                      regionTagHi: 'हरित राजस्थान विस्तार जिला',
+                      focusSummaryEn: `Community plantation, water stewardship, and Harit Mitra mobilisation across ${quickRajasthanDist}.`,
+                      focusSummaryHi: `${quickRajasthanDist} में जन-सहभागिता वृक्षारोपण, जल संरक्षण और हरित मित्र नेटवर्क विस्तार।`,
+                      coordinatorName: `${quickRajasthanDist} Coordination Desk`,
+                      outreachNotes: 'District activation initiated via Admin Hub.',
+                      progressNotesEn: 'Baseline planning underway; verified field data will appear once campaigns begin.',
+                      progressNotesHi: 'प्रारंभिक योजना चरण; सत्यापित प्रगति आँकड़े अभियान प्रारंभ होने पर प्रकाशित होंगे।',
+                      mapX: 280,
+                      mapY: 220,
+                      subDistricts: [],
+                      villages: [],
+                      galleryUrls: [],
+                      outreachItems: [],
+                      isActive: true,
+                      displayOrder: districts.length + 1,
+                    });
+                    setQuickRajasthanDist('');
+                  }}
+                  className="px-3.5 py-1.5 rounded-xl bg-[#144527] disabled:opacity-45 text-white font-semibold cursor-pointer whitespace-nowrap"
+                >
+                  Activate District
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
