@@ -1,0 +1,253 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { resolvePanIndiaLocationFeed, getStatesSummary } from './haritBharatLogic';
+import type { PublicBootstrapPayload } from '../admin/types';
+
+const mockBootstrap: PublicBootstrapPayload = {
+  forms: [],
+  impactMetrics: [],
+  csrProposals: [],
+  siteGovernance: null,
+  districts: [
+    {
+      slug: 'bhilwara',
+      stateSlug: 'rajasthan',
+      stateNameEn: 'Rajasthan',
+      stateNameHi: 'राजस्थान',
+      nameEn: 'Bhilwara',
+      nameHi: 'भीलवाड़ा',
+      regionTagEn: 'Phase 1',
+      regionTagHi: 'प्रथम चरण',
+      focusSummaryEn: 'Native agroforestry',
+      focusSummaryHi: 'देशी कृषि वानिकी',
+      coordinatorName: 'Coordinator A',
+      outreachNotes: '',
+      progressNotesEn: '',
+      progressNotesHi: '',
+      subDistricts: ['Suwana', 'Mandal'],
+      villages: ['Hameergarh', 'Pur'],
+      galleryUrls: [],
+      outreachItems: [],
+      isActive: true,
+      displayOrder: 1,
+    },
+    {
+      slug: 'kutch',
+      stateSlug: 'gujarat',
+      stateNameEn: 'Gujarat',
+      stateNameHi: 'गुजरात',
+      nameEn: 'Kutch',
+      nameHi: 'कच्छ',
+      regionTagEn: 'Expansion',
+      regionTagHi: 'विस्तार',
+      focusSummaryEn: 'Arid water conservation',
+      focusSummaryHi: 'शुष्क जल संरक्षण',
+      coordinatorName: 'Coordinator B',
+      outreachNotes: '',
+      progressNotesEn: '',
+      progressNotesHi: '',
+      subDistricts: ['Bhuj', 'Mandvi'],
+      villages: ['Madhapar'],
+      galleryUrls: [],
+      outreachItems: [],
+      isActive: true,
+      displayOrder: 2,
+    },
+  ],
+  projects: [
+    {
+      id: 'p1',
+      titleEn: 'Bhilwara Green Drive',
+      titleHi: 'भीलवाड़ा हरित अभियान',
+      locationEn: 'Bhilwara, Rajasthan',
+      locationHi: 'भीलवाड़ा, राजस्थान',
+      stateName: 'Rajasthan',
+      district: 'Bhilwara',
+      subDistrict: 'Suwana',
+      villageOrTown: 'Hameergarh',
+      missionCategoryEn: 'Harit Rajasthan',
+      missionCategoryHi: 'हरित राजस्थान',
+      status: 'Ongoing',
+      objectivesEn: 'Plant native trees',
+      objectivesHi: 'देशी वृक्षारोपण',
+      beneficiaryEn: 'Farmers',
+      beneficiaryHi: 'किसान',
+      noteEn: '',
+      noteHi: '',
+      startDate: '2026-01-01',
+      progressPeriod: '2026',
+      imageUrl: '',
+      reportUrl: '',
+      partnerName: '',
+      partnerConfirmedForPublic: false,
+    },
+    {
+      id: 'p2',
+      titleEn: 'Kutch Rainwater Revival',
+      titleHi: 'कच्छ जल संरक्षण',
+      locationEn: 'Bhuj, Kutch, Gujarat',
+      locationHi: 'भुज, कच्छ, गुजरात',
+      stateName: 'Gujarat',
+      district: 'Kutch',
+      subDistrict: 'Bhuj',
+      villageOrTown: 'Madhapar',
+      missionCategoryEn: 'Water',
+      missionCategoryHi: 'जल',
+      status: 'Proposed',
+      objectivesEn: 'Revive village ponds',
+      objectivesHi: 'तालाब पुनर्जीवन',
+      beneficiaryEn: 'Villages',
+      beneficiaryHi: 'ग्राम',
+      noteEn: '',
+      noteHi: '',
+      startDate: '2026-06-01',
+      progressPeriod: '2026',
+      imageUrl: '',
+      reportUrl: '',
+      partnerName: '',
+      partnerConfirmedForPublic: false,
+    },
+  ],
+  marathonEvents: [
+    {
+      id: 'm1',
+      titleEn: 'Harit Marathon Bhilwara',
+      titleHi: 'हरित मैराथन भीलवाड़ा',
+      themeEn: 'Green Run',
+      themeHi: 'हरित दौड़',
+      stateName: 'Rajasthan',
+      district: 'Bhilwara',
+      subDistrict: 'Suwana',
+      villageOrTown: 'Hameergarh',
+      eventDate: '2026-12-20',
+      dateDisplayEn: '20 Dec 2026',
+      dateDisplayHi: '20 दिसंबर 2026',
+      venueEn: 'Bhilwara',
+      venueHi: 'भीलवाड़ा',
+      bannerUrl: '',
+      routeNotesEn: '',
+      routeNotesHi: '',
+      rulesEn: '',
+      rulesHi: '',
+      safetyInfoEn: '',
+      safetyInfoHi: '',
+      postEventReportUrl: '',
+      countdownEnabled: true,
+      status: 'Confirmed',
+      raceCategories: [],
+      schedule: [],
+      guests: [],
+      sponsors: [],
+      registrationOpen: true,
+    },
+  ],
+  contentItems: [
+    {
+      id: 'c1',
+      sectionType: 'news',
+      titleEn: 'Gujarat Expansion Announcement',
+      titleHi: 'गुजरात विस्तार घोषणा',
+      summaryEn: 'Exploring Kutch',
+      summaryHi: 'कच्छ पहल',
+      stateName: 'Gujarat',
+      districtName: 'Kutch',
+      subDistrict: 'Bhuj',
+      villageOrTown: 'Madhapar',
+      mediaUrl: '',
+      mediaType: 'article',
+      videoUrl: '',
+      pdfUrl: '',
+      relatedMissionSlug: 'harit-rajasthan',
+      courseMeta: null,
+      categoryTag: 'News',
+      status: 'Published',
+    },
+  ],
+  campaigns: [
+    {
+      id: 'cmp-1',
+      campaignCode: 'GVD-CMP-KUT-2026-1001',
+      titleEn: 'Kutch Water & Plantation Campaign',
+      titleHi: 'कच्छ जल एवं वृक्षारोपण अभियान',
+      summaryEn: 'District mobilization in Kutch.',
+      summaryHi: 'कच्छ जिले में अभियान।',
+      missionPillar: 'Harit Bharat',
+      scope: 'Local',
+      stateSlug: 'gujarat',
+      stateName: 'Gujarat',
+      district: 'Kutch',
+      subDistrict: 'Bhuj',
+      villageOrTown: 'Madhapar',
+      startDate: '2026-11-01',
+      endDate: '2027-03-31',
+      status: 'Active',
+      isPublished: true,
+      bannerUrl: '',
+      roles: [
+        {
+          id: 'role-1',
+          roleCode: 'ROLE-HM',
+          titleEn: 'Harit Mitra Coordinator',
+          titleHi: 'हरित मित्र समन्वयक',
+          descriptionEn: 'Lead village onboarding.',
+          descriptionHi: 'ग्राम पंजीकरण नेतृत्व।',
+          formType: 'harit_mitra',
+          maxSlots: 25,
+          isOpen: true,
+        },
+      ],
+    },
+    {
+      id: 'cmp-2',
+      campaignCode: 'GVD-CMP-BHI-2026-1002',
+      titleEn: 'Bhilwara Agroforestry Drive',
+      titleHi: 'भीलवाड़ा कृषि वानिकी अभियान',
+      summaryEn: 'District mobilization in Bhilwara.',
+      summaryHi: 'भीलवाड़ा जिले में अभियान।',
+      missionPillar: 'Harit Rajasthan',
+      scope: 'Local',
+      stateSlug: 'rajasthan',
+      stateName: 'Rajasthan',
+      district: 'Bhilwara',
+      subDistrict: 'Suwana',
+      villageOrTown: 'Hameergarh',
+      startDate: '2026-11-01',
+      endDate: '2027-03-31',
+      status: 'Active',
+      isPublished: true,
+      bannerUrl: '',
+      roles: [],
+    },
+  ],
+};
+
+test('cascading filter isolates Gujarat -> Kutch -> Bhuj -> Madhapar', () => {
+  const res = resolvePanIndiaLocationFeed(mockBootstrap, {
+    stateSlug: 'gujarat',
+    district: 'Kutch',
+    subDistrict: 'Bhuj',
+    villageOrTown: 'Madhapar',
+  });
+
+  assert.equal(res.selectedStateNameEn, 'Gujarat');
+  assert.ok(res.availableDistricts.includes('Kutch'));
+  assert.ok(res.availableSubDistricts.includes('Bhuj'));
+  assert.ok(res.availableVillages.includes('Madhapar'));
+  assert.equal(res.projects.length, 1);
+  assert.equal(res.projects[0].id, 'p2');
+  assert.equal(res.events.length, 0);
+  assert.equal(res.updates.length, 1);
+  assert.equal(res.districts.length, 1);
+  assert.equal(res.campaigns.length, 1);
+  assert.equal(res.campaigns[0].campaignCode, 'GVD-CMP-KUT-2026-1001');
+  assert.equal(res.campaigns[0].roles.length, 1);
+});
+
+test('states summary detects active states accurately', () => {
+  const summary = getStatesSummary(mockBootstrap);
+  assert.ok(summary.totalStatesAndUts >= 36);
+  assert.equal(summary.activeStatesCount, 2);
+  assert.ok(summary.activeStateSlugs.includes('rajasthan'));
+  assert.ok(summary.activeStateSlugs.includes('gujarat'));
+});
+

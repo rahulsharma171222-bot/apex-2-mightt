@@ -1,0 +1,507 @@
+import type { MissionData } from '../types/goveda';
+
+export const MISSIONS_DATA: MissionData[] = [
+  {
+    id: 'carbon-credit',
+    number: 1,
+    slug: 'carbon-credit',
+    title: {
+      hi: 'कार्बन क्रेडिट एवं जलवायु कार्रवाई',
+      en: 'Carbon Credit & Climate Action',
+    },
+    shortTitle: {
+      hi: 'कार्बन क्रेडिट एवं जलवायु कार्रवाई',
+      en: 'Carbon Credit & Climate Action',
+    },
+    tagline: {
+      hi: 'किसानों, गाँवों और समुदायों को वृक्षारोपण और सतत कृषि के माध्यम से जलवायु समाधानों से जोड़ना',
+      en: 'Connecting Farmers, Villages, Nature & Climate Solutions',
+    },
+    description: {
+      hi: 'कार्बन क्रेडिट शिक्षा, किसान एवं हरित मित्र पंजीकरण, MRV जागरूकता और पात्र परियोजनाओं के विकास की पारदर्शी प्रक्रिया।',
+      en: 'Simple climate literacy, farmer & Harit Mitra onboarding, transparent MRV awareness, and eligible carbon project pathways.',
+    },
+    imageKey: 'carbonFarmer',
+    iconName: 'CloudSun',
+    treePosition: { x: 43, y: 80, side: 'left' },
+    disclaimer: {
+      hi: 'महत्वपूर्ण सूचना: केवल पेड़ लगाने या पंजीकरण करने से कार्बन क्रेडिट या निश्चित आय की कोई गारंटी नहीं होती है। वास्तविक परिणाम परियोजना की पात्रता, वैज्ञानिक मापन, स्वतंत्र सत्यापन, रजिस्ट्री नियमों और बाजार परिस्थितियों पर निर्भर करते हैं।',
+      en: 'Important Notice: Planting saplings or registering does not guarantee carbon credits or fixed income. Outcomes depend on project eligibility, baseline assessment, independent verification (MRV), registry rules, and market contracts.',
+    },
+    subpages: [
+      {
+        code: 'A',
+        title: { hi: 'कार्बन क्रेडिट परिचय', en: 'Carbon Credit Introduction' },
+        summary: {
+          hi: 'सरल भाषा में समझें कि 1 कार्बन क्रेडिट = 1 टन CO₂e उत्सर्जन में कमी या अवशोषण क्या है और यह वृक्षारोपण से कैसे जुड़ता है।',
+          en: 'Understand in clear, practical terms how 1 Carbon Credit equals 1 tonne of verified CO₂e reduction or removal and how trees store carbon.',
+        },
+      },
+      {
+        code: 'B',
+        title: { hi: 'जागरूकता एवं प्रशिक्षण', en: 'Awareness & Learning' },
+        summary: {
+          hi: 'ग्रीनहाउस गैसों के स्रोत, जलवायु परिवर्तन का कृषि पर प्रभाव, छोटे लेख, चित्र और ग्रामीण उदाहरण।',
+          en: 'Climate education modules covering GHG emission sources, agricultural impact, illustrated guides, and regional audio-friendly explanations.',
+        },
+      },
+      {
+        code: 'C',
+        title: { hi: 'किसान पंजीकरण', en: 'Farmer Registration' },
+        summary: {
+          hi: 'भूमि एवं वृक्षारोपण रुचि के साथ प्राथमिक किसान पंजीकरण (संवेदनशील भूमि दस्तावेज़ केवल आवश्यक सत्यापन चरण में सुरक्षित रूप से)।',
+          en: 'Preliminary farmer onboarding capturing location, landholding size, and species interest without unnecessary document collection upfront.',
+        },
+      },
+      {
+        code: 'D',
+        title: { hi: 'हरित मित्र पंजीकरण', en: 'Harit Mitra Registration' },
+        summary: {
+          hi: 'ग्राम स्तर पर किसानों को जोड़ने, पौध देखभाल मार्गदर्शन और जन-जागरूकता समन्वय हेतु स्थानीय हरित मित्र सहभागिता।',
+          en: 'Community volunteer registration for connecting farmers, encouraging sapling survival, and local environmental awareness.',
+        },
+      },
+      {
+        code: 'E',
+        title: { hi: 'वृक्षारोपण कार्यक्रम', en: 'Tree Plantation Programme' },
+        summary: {
+          hi: 'राजस्थान के शुष्क व अर्ध-शुष्क क्षेत्रों के लिए उपयुक्त देशी प्रजातियाँ (खेजड़ी, नीम, रोहिड़ा, आँवला, बेर) एवं देखभाल दिशानिर्देश।',
+          en: 'Native Rajasthan species selection (Khejri, Neem, Rohida, Amla, Ber), boundary plantation standards, and survival care guidelines.',
+        },
+      },
+      {
+        code: 'F',
+        title: { hi: 'परियोजना पात्रता एवं विकास प्रक्रिया', en: 'Project Eligibility & Development Process' },
+        summary: {
+          hi: 'प्रारंभिक पंजीकरण से लेकर बेसलाइन, पद्धति मूल्यांकन, स्वतंत्र सत्यापन, रजिस्ट्री और संभावित लाभ-साझेदारी तक के 10 चरण।',
+          en: 'The 10-stage lifecycle from Initial Registration and Baseline Assessment through Methodology, Independent Verification, and Registry Issuance.',
+        },
+      },
+      {
+        code: 'G',
+        title: { hi: 'निगरानी, रिपोर्टिंग एवं सत्यापन (MRV)', en: 'Monitoring, Reporting & Verification (MRV)' },
+        summary: {
+          hi: 'वृक्ष प्रजाति, ऊँचाई, जीवितता रिकॉर्ड और स्वतंत्र ऑडिट की वैज्ञानिक प्रणाली। विस्तृत GPS और ट्री-लेवल जियो-टैगिंग अलग समर्पित सॉफ्टवेयर में विकसित की जाएगी।',
+          en: 'Scientific tracking of species, growth, and survival. Detailed GPS, geo-tagging, and tree-level field verification will operate in a dedicated software module.',
+        },
+      },
+      {
+        code: 'H',
+        title: { hi: 'कार्बन क्रेडिट सामान्य प्रश्न (FAQs)', en: 'Carbon Credit FAQs' },
+        summary: {
+          hi: 'किसानों, ग्राम पंचायतों और संस्थाओं के लिए 15+ व्यावहारिक प्रश्नों के स्पष्ट उत्तर।',
+          en: '15+ practical questions and transparent answers covering eligibility, timelines, costs, and non-guarantee disclosures.',
+        },
+      },
+      {
+        code: 'I',
+        title: { hi: 'आवेदन की स्थिति देखें', en: 'Application Status' },
+        summary: {
+          hi: 'यूनिक Application Reference ID द्वारा अपने किसान या हरित मित्र आवेदन की अद्यतन स्थिति जांचें।',
+          en: 'Check your farmer or Harit Mitra application progress anytime using your unique Application Reference ID.',
+        },
+      },
+      {
+        code: 'J',
+        title: { hi: 'विशेषज्ञ सहायता', en: 'Expert Support' },
+        summary: {
+          hi: 'कृषि वानिकी, भूमि पात्रता और जलवायु परियोजना से जुड़े प्रश्नों के लिए तकनीकी सहायता अनुरोध।',
+          en: 'Request guidance from GOVEDA climate and agroforestry specialists for group or institutional queries.',
+        },
+      },
+    ],
+  },
+  {
+    id: 'harit-rajasthan',
+    number: 2,
+    slug: 'harit-rajasthan',
+    title: {
+      hi: 'हरित राजस्थान एवं वृक्षारोपण',
+      en: 'Harit Rajasthan & Tree Plantation',
+    },
+    shortTitle: {
+      hi: 'हरित राजस्थान एवं वृक्षारोपण',
+      en: 'Harit Rajasthan & Plantation',
+    },
+    tagline: {
+      hi: 'भीलवाड़ा, चूरू, बीकानेर, फलोदी और जोधपुर से राज्यव्यापी हरित अभियान',
+      en: 'Building a Greener Rajasthan, Village by Village',
+    },
+    description: {
+      hi: 'ग्रामीण वृक्षारोपण, स्कूल-कॉलेज हरित परिसर, स्थानीय नर्सरी विकास, जल संरक्षण और पौधों की जीवितता निगरानी पर केंद्रित अभियान।',
+      en: 'Regional green mission focused on native tree plantation, village nurseries, green campuses, water conservation, and sapling survival care.',
+    },
+    imageKey: 'haritRajasthan',
+    iconName: 'Trees',
+    subpages: [
+      { code: 'A', title: { hi: 'अभियान परिचय', en: 'Campaign Introduction' }, summary: { hi: 'राजस्थान को अधिक हरित, स्वच्छ और जलवायु-सक्षम बनाने की क्षेत्रीय पहल।', en: 'Overview of GOVEDA’s phased district-by-district green transformation approach.' } },
+      { code: 'B', title: { hi: 'वृक्षारोपण मिशन', en: 'Tree Plantation Mission' }, summary: { hi: 'दीर्घकालिक हरित आवरण और स्थानीय पारिस्थितिकी संरक्षण का संकल्प।', en: 'Long-term afforestation and native biodiversity restoration targets.' } },
+      { code: 'C', title: { hi: 'ग्राम वृक्षारोपण कार्यक्रम', en: 'Village Plantation Programme' }, summary: { hi: 'ग्राम पंचायतों, सामुदायिक भूमि और खेत की मेड़ों पर स्थानीय प्रजातियों का रोपण।', en: 'Community land and farm boundary plantation coordinated with Gram Panchayats.' } },
+      { code: 'D', title: { hi: 'स्कूल एवं कॉलेज ग्रीन कैंपस', en: 'School & College Green Campus' }, summary: { hi: 'शैक्षणिक परिसरों में छायादार वृक्ष, हरित क्लब और छात्र जागरूकता।', en: 'Campus tree care, eco-clubs, and student environmental stewardship.' } },
+      { code: 'E', title: { hi: 'सामुदायिक वृक्षारोपण', en: 'Community Plantation' }, summary: { hi: 'नागरिकों, स्वयंसेवकों और स्थानीय संस्थाओं की साझा भागीदारी।', en: 'Public green drives uniting citizens, institutions, and local bodies.' } },
+      { code: 'F', title: { hi: 'नर्सरी विकास', en: 'Nursery Development' }, summary: { hi: 'स्थानीय जलवायु के अनुकूल पौधशालाएँ एवं ग्रामीण रोजगार के अवसर।', en: 'Decentralised rural sapling nurseries cultivating drought-resilient native flora.' } },
+      { code: 'G', title: { hi: 'वृक्ष देखभाल एवं जीवितता', en: 'Tree Care & Survival' }, summary: { hi: 'केवल रोपण नहीं, बल्कि ट्री-गार्ड, सिंचाई और तीन-वर्षीय जीवितता पर प्रमुख ध्यान।', en: 'Prioritising post-plantation protection, watering, and multi-year survival rates.' } },
+      { code: 'H', title: { hi: 'जल संरक्षण', en: 'Water Conservation' }, summary: { hi: 'वर्षा जल संचयन, पारंपरिक कुंड और मल्चिंग द्वारा जल बचत।', en: 'Rainwater harvesting, kund restoration, and soil-moisture conservation.' } },
+      { code: 'I', title: { hi: 'वृक्षारोपण सहभागिता फॉर्म', en: 'Plantation Participation Form' }, summary: { hi: 'किसान, विद्यालय या ग्राम स्तर पर वृक्षारोपण अभियान से जुड़ने का आवेदन।', en: 'Submit interest to host or participate in a local plantation drive.' } },
+      { code: 'J', title: { hi: 'अभियान प्रगति', en: 'Campaign Progress' }, summary: { hi: 'सत्यापित प्रगति विवरण — केवल प्रमाणित आँकड़े ही प्रकाशित किए जाएंगे।', en: 'Transparent reporting where only field-verified figures are published.' } },
+    ],
+  },
+  {
+    id: 'self-reliant-gaushala',
+    number: 3,
+    slug: 'self-reliant-gaushala',
+    title: {
+      hi: 'आत्मनिर्भर गौशाला मिशन',
+      en: 'Self-Reliant Gaushala',
+    },
+    shortTitle: {
+      hi: 'आत्मनिर्भर गौशाला मिशन',
+      en: 'Self-Reliant Gaushala',
+    },
+    tagline: {
+      hi: 'गौशालाओं को केवल दान पर निर्भरता से निकालकर कृषि, जैविक खाद और संसाधन प्रबंधन से जोड़ना',
+      en: 'Transforming Gaushalas into Sustainable Hubs of Cattle Welfare & Rural Economy',
+    },
+    description: {
+      hi: 'पशु कल्याण, गोबर से कम्पोस्ट व वर्मीकम्पोस्ट, जीवामृत, चारा उत्पादन, पशु चिकित्सा संपर्क और गौशाला प्रशिक्षण का समग्र आर्थिक मॉडल।',
+      en: 'Integrating indigenous cattle care with vermicompost, Jeevamrit, green fodder, veterinary support, and community training.',
+    },
+    imageKey: 'gaushalaBiogas',
+    iconName: 'Home',
+    treePosition: { x: 47, y: 40, side: 'left' },
+    disclaimer: {
+      hi: 'नोट: पशु उपस्थिति, कर्मचारी प्रबंधन, AI रोग पहचान और टेलीमेडिसिन के लिए विस्तृत Gaushala Management Software अलग मॉड्यूल के रूप में विकसित करने की योजना है।',
+      en: 'Note: Detailed cattle attendance, staff logs, AI disease detection, and telemedicine will be developed as a dedicated software module.',
+    },
+    subpages: [
+      { code: 'A', title: { hi: 'गौशाला मिशन परिचय', en: 'Gaushala Mission Introduction' }, summary: { hi: 'दान-आधारित व्यवस्था से आत्मनिर्भर ग्रामीण संसाधन केंद्र की ओर।', en: 'Moving from donation dependence to circular rural resource stewardship.' } },
+      { code: 'B', title: { hi: 'गौशाला पंजीकरण', en: 'Gaushala Registration' }, summary: { hi: 'गोवंश संख्या, गोबर उपलब्धता और बुनियादी सुविधाओं के साथ पंजीकरण।', en: 'Register your Gaushala with herd details, dung availability, and support needs.' } },
+      { code: 'C', title: { hi: 'गौशाला सर्वेक्षण', en: 'Gaushala Survey' }, summary: { hi: 'जिला-स्तरीय आवश्यकता मूल्यांकन और आधारभूत संरचना मानचित्रण।', en: 'District assessment of infrastructure, fodder supply, and water availability.' } },
+      { code: 'D', title: { hi: 'पशु कल्याण', en: 'Cattle Welfare' }, summary: { hi: 'स्वच्छ आवास, पोषण, छाया और देशी गोवंश संरक्षण मानक।', en: 'Hygienic shelters, balanced nutrition, shade, and indigenous breed care.' } },
+      { code: 'E', title: { hi: 'गोबर आधारित उत्पाद', en: 'Dung-Based Products' }, summary: { hi: 'गोकाष्ठ, जैविक ईंधन पिंड और मूल्यवर्धित ग्रामीण उत्पाद।', en: 'Cow-dung logs, eco-friendly utility products, and local livelihoods.' } },
+      { code: 'F', title: { hi: 'जैविक खाद एवं जीवामृत', en: 'Organic Fertiliser & Jeevamrit' }, summary: { hi: 'वर्मीकम्पोस्ट और जीवामृत निर्माण व किसानों तक आपूर्ति।', en: 'Structured vermicompost beds and Jeevamrit preparation for regional farms.' } },
+      { code: 'G', title: { hi: 'चारा विकास', en: 'Fodder Development' }, summary: { hi: 'स्थानीय हरा चारा उत्पादन और चारा बैंक की स्थापना।', en: 'Local green fodder cultivation and seasonal fodder storage planning.' } },
+      { code: 'H', title: { hi: 'पशु चिकित्सा सहायता', en: 'Veterinary Support' }, summary: { hi: 'टीकाकरण शिविर, प्राथमिक देखभाल और पशु चिकित्सक समन्वय।', en: 'Preventive vaccination camps and veterinary specialist linkages.' } },
+      { code: 'I', title: { hi: 'गौशाला प्रशिक्षण', en: 'Gaushala Training' }, summary: { hi: 'प्रबंधकों और गौसेवकों के लिए आधुनिक रिकॉर्ड व स्वच्छता प्रशिक्षण।', en: 'Capacity building for Gaushala managers on hygiene and circular operations.' } },
+      { code: 'J', title: { hi: 'आत्मनिर्भरता मॉडल', en: 'Self-Reliance Model' }, summary: { hi: '10-सूत्रीय आर्थिक एवं सामाजिक आत्मनिर्भरता रूपरेखा।', en: 'Comprehensive economic model linking cattle care, compost, biogas, and nurseries.' } },
+      { code: 'K', title: { hi: 'गौशाला सहभागिता', en: 'Gaushala Partnership' }, summary: { hi: 'CSR, ग्राम पंचायत और किसानों के साथ दीर्घकालिक सहभागिता।', en: 'Institutional and CSR collaboration opportunities for sustainable Gaushalas.' } },
+    ],
+  },
+  {
+    id: 'biogas-cbg',
+    number: 4,
+    slug: 'biogas-cbg',
+    title: {
+      hi: 'स्वच्छ ऊर्जा (सौर, बायोगैस, CBG)',
+      en: 'Clean Energy: Biogas & Bio-CNG/CBG',
+    },
+    shortTitle: {
+      hi: 'स्वच्छ ऊर्जा (सौर, बायोगैस, CBG)',
+      en: 'Clean Energy (Biogas & CBG)',
+    },
+    tagline: {
+      hi: 'गोबर संग्रह से बायोगैस, जैव-स्लरी और व्यवहार्य जिला-स्तरीय CBG परियोजनाओं की ओर',
+      en: 'From Dung Collection to Clean Biogas, Bio-Slurry & Proposed CBG Pathways',
+    },
+    description: {
+      hi: 'ग्रामीण बायोगैस, जैव-स्लरी का खेतों में उपयोग और जिला स्तरीय बायो-CNG/CBG परियोजनाओं की तकनीकी व्यवहार्यता व नियामकीय समझ।',
+      en: 'Technical clarity on biogas digestion, organic slurry reuse, and feasibility assessment for district-level Bio-CNG (CBG) initiatives.',
+    },
+    imageKey: 'biogasCbgPlant',
+    iconName: 'Zap',
+    treePosition: { x: 54, y: 18, side: 'left' },
+    disclaimer: {
+      hi: 'तकनीकी स्पष्टीकरण: बायोगैस और वाहन-उपयुक्त CBG एक ही उत्पाद नहीं हैं। CBG के लिए गैस शुद्धिकरण, संपीड़न और वैधानिक सुरक्षा अनुमतियाँ आवश्यक होती हैं; घरेलू LPG सिलेंडर में इसका सीधा उपयोग नहीं किया जा सकता। वर्तमान में प्रस्तावित CBG परियोजनाएँ व्यवहार्यता अध्ययनाधीन हैं।',
+      en: 'Technical Clarification: Raw biogas and vehicle-grade CBG are distinct. CBG requires purification, high-pressure compression, and statutory safety approvals; standard domestic LPG cylinders cannot be used for CBG. District CBG plants are currently at feasibility/proposal stage.',
+    },
+    subpages: [
+      { code: 'A', title: { hi: 'परिचय', en: 'Introduction' }, summary: { hi: 'ग्रामीण कचरा एवं गोबर से स्वच्छ ईंधन और जैविक उर्वरक की परिकल्पना।', en: 'Overview of rural clean energy and organic slurry recovery.' } },
+      { code: 'B', title: { hi: 'बायोगैस तकनीक', en: 'Biogas Technology' }, summary: { hi: 'ग्राम व गौशाला स्तर पर एनाएरोबिक डाइजेस्टर की कार्यप्रणाली।', en: 'How anaerobic digestion converts dung into cooking gas and rich slurry.' } },
+      { code: 'C', title: { hi: 'बायो-CNG / CBG तकनीक', en: 'Bio-CNG / CBG Technology' }, summary: { hi: 'गैस शुद्धिकरण (स्क्रबिंग), संपीड़न और वाणिज्यिक मानक।', en: 'Purification, compression, and safety compliance needed for CBG grade fuel.' } },
+      { code: 'D', title: { hi: 'गोबर संग्रह मॉडल', en: 'Dung Collection Model' }, summary: { hi: 'पशुपालकों और गौशालाओं से नियमित गोबर संकलन की रूपरेखा।', en: 'Structured dung aggregation models linking cattle owners and Gaushalas.' } },
+      { code: 'E', title: { hi: 'जिला-स्तरीय CBG परियोजना (प्रस्तावित)', en: 'Proposed District-Level CBG Project' }, summary: { hi: 'प्रस्तावित क्लस्टर मॉडल और व्यवहार्यता मूल्यांकन मानदंड।', en: 'Feasibility parameters for district-scale CBG clusters (proposed status).' } },
+      { code: 'F', title: { hi: 'जैव-स्लरी एवं उर्वरक', en: 'Organic Slurry & Fertiliser' }, summary: { hi: 'बायोगैस से प्राप्त स्लरी का खेतों की उर्वरता बढ़ाने में उपयोग।', en: 'Using nutrient-rich bio-slurry to enrich soil organic carbon.' } },
+      { code: 'G', title: { hi: 'व्यवहार्यता अध्ययन', en: 'Feasibility Study' }, summary: { hi: 'कच्चा माल, जल उपलब्धता, पूंजीगत लागत और नियामकीय स्वीकृतियाँ।', en: 'Evaluating feedstock volume, capex, safety norms, and market offtake.' } },
+      { code: 'H', title: { hi: 'प्रौद्योगिकी भागीदारी', en: 'Technology Partnerships' }, summary: { hi: 'अनुसंधान संस्थानों एवं प्रमाणित इंजीनियरिंग भागीदारों से संवाद।', en: 'Collaborating with accredited clean-tech engineering providers.' } },
+      { code: 'I', title: { hi: 'गौशाला एवं किसान सहभागिता', en: 'Gaushala / Farmer Participation' }, summary: { hi: 'बायोगैस और जैव-स्लरी अपनाने के इच्छुक समूहों का पंजीकरण।', en: 'Expression of interest for Gaushalas and farmer collectives.' } },
+      { code: 'J', title: { hi: 'परियोजना पूछताछ', en: 'Project Inquiry' }, summary: { hi: 'बायोगैस अथवा स्वच्छ ऊर्जा पहल हेतु तकनीकी परामर्श अनुरोध।', en: 'Submit technical or CSR inquiries for clean energy pilots.' } },
+    ],
+  },
+  {
+    id: 'organic-farming',
+    number: 5,
+    slug: 'organic-farming',
+    title: {
+      hi: 'जैविक खेती और ग्रामीण विकास',
+      en: 'Organic & Modern Farming',
+    },
+    shortTitle: {
+      hi: 'जैविक खेती और ग्रामीण विकास',
+      en: 'Organic & Modern Farming',
+    },
+    tagline: {
+      hi: 'मिट्टी-पानी परीक्षण, ड्रिप सिंचाई, जैविक खाद और चरणबद्ध कृषि सुधार',
+      en: 'Soil Testing, Water Efficiency & Gradual Transition to Resilient Farming',
+    },
+    description: {
+      hi: 'खेती के वैज्ञानिक व व्यावहारिक तरीके: मिट्टी-जल जाँच (pH, EC, पोषक तत्व), एकीकृत पोषक प्रबंधन, ड्रिप सिंचाई और किसान प्रशिक्षण।',
+      en: 'Practical guidance on scientific soil & water testing, integrated nutrient management, drip irrigation, and farmer field schools.',
+    },
+    imageKey: 'organicAgroforestry',
+    iconName: 'Sprout',
+    treePosition: { x: 46, y: 60, side: 'left' },
+    disclaimer: {
+      hi: 'कृषि सलाह: रासायनिक उर्वरकों का अंधाधुंध उपयोग घटाना आवश्यक है, परंतु हर खेत में इन्हें एक दिन में पूर्णतः बंद करने के बजाय मिट्टी परीक्षण और जैविक विकल्पों के साथ चरणबद्ध बदलाव अधिक व्यावहारिक है।',
+      en: 'Agronomy Note: Rather than abrupt cessation on all plots, GOVEDA advocates soil testing and a phased, scientific transition combining organic inputs and integrated nutrient management.',
+    },
+    subpages: [
+      { code: 'A', title: { hi: 'मिशन परिचय', en: 'Mission Introduction' }, summary: { hi: 'कम लागत, स्वस्थ मृदा और टिकाऊ उत्पादन का संतुलित दृष्टिकोण।', en: 'Balancing input cost reduction, soil health, and steady farm yields.' } },
+      { code: 'B', title: { hi: 'जैविक खेती', en: 'Organic Farming' }, summary: { hi: 'कम्पोस्ट, वर्मीकम्पोस्ट, हरी खाद और फसल चक्र का महत्व।', en: 'Compost, green manure, crop rotation, and biological pest management.' } },
+      { code: 'C', title: { hi: 'मृदा परीक्षण', en: 'Soil Testing' }, summary: { hi: 'pH, EC, कार्बनिक कार्बन और सूक्ष्म पोषक तत्वों की वैज्ञानिक जाँच।', en: 'Testing pH, electrical conductivity, organic carbon, and NPK balance.' } },
+      { code: 'D', title: { hi: 'जल परीक्षण', en: 'Water Testing' }, summary: { hi: 'शुष्क क्षेत्रों में सिंचाई जल की लवणता (TDS/Salinity) जाँच एवं उपयुक्त फसल चयन।', en: 'Assessing irrigation salinity in arid districts like Churu, Bikaner, and Phalodi.' } },
+      { code: 'E', title: { hi: 'ड्रिप एवं सूक्ष्म सिंचाई', en: 'Drip Irrigation' }, summary: { hi: 'मल्चिंग और ड्रिप प्रणाली द्वारा जल दक्षता बढ़ाना।', en: 'Water conservation using drip lines, mulching, and shade nets.' } },
+      { code: 'F', title: { hi: 'फसल प्रबंधन', en: 'Crop Management' }, summary: { hi: 'क्षेत्रीय जलवायु के अनुसार कम पानी वाली फसलें एवं कृषि वानिकी।', en: 'Drought-tolerant crop varieties and agroforestry integration.' } },
+      { code: 'G', title: { hi: 'प्राकृतिक एवं जैविक आदान', en: 'Natural & Organic Inputs' }, summary: { hi: 'जीवामृत, बीजामृत, नीमास्त्र और स्थानीय जैव-आदान निर्माण।', en: 'Preparing local bio-enhancers and botanical pest repellents.' } },
+      { code: 'H', title: { hi: 'चारा खेती', en: 'Fodder Farming' }, summary: { hi: 'पशुपालकों और गौशालाओं के लिए पौष्टिक हरा चारा उत्पादन।', en: 'Cultivating high-nutrition green fodder aligned with local rainfall.' } },
+      { code: 'I', title: { hi: 'किसान प्रशिक्षण', en: 'Farmer Training' }, summary: { hi: 'प्रदर्शन खेत एवं सरल स्थानीय भाषा (मारवाड़ी/मेवाड़ी/हिंदी) में मार्गदर्शन।', en: 'Field demonstrations delivered in accessible Hindi and local dialects.' } },
+      { code: 'J', title: { hi: 'कृषि विशेषज्ञ पूछताछ', en: 'Agriculture Expert Inquiry' }, summary: { hi: 'मृदा या फसल संबंधी परामर्श हेतु विशेषज्ञ संपर्क।', en: 'Submit soil or crop management queries to our agronomy volunteers.' } },
+    ],
+  },
+  {
+    id: 'clean-india-plastic-free',
+    number: 6,
+    slug: 'clean-india-plastic-free',
+    title: {
+      hi: 'स्वच्छ भारत एवं प्लास्टिक-मुक्त अभियान',
+      en: 'Clean India & Plastic-Free Campaign',
+    },
+    shortTitle: {
+      hi: 'स्वच्छ भारत एवं प्लास्टिक-मुक्त अभियान',
+      en: 'Clean India & Plastic-Free',
+    },
+    tagline: {
+      hi: 'कचरा पृथक्करण, मंदिर अपशिष्ट प्रबंधन और महिला समूहों द्वारा कपड़े के थैले',
+      en: 'Waste Segregation, Temple Waste Composting & SHG Cloth Bag Alternatives',
+    },
+    description: {
+      hi: 'गाँव और शहर स्वच्छता अभियान, एकल-उपयोग प्लास्टिक का विकल्प (महिला स्वयं सहायता समूहों द्वारा कपड़े के थैले), और संस्थागत सहभागिता।',
+      en: 'Community cleanliness drives, wet-dry segregation, temple floral composting, and reusable cotton bags stitched by rural women SHGs.',
+    },
+    imageKey: 'wasteCleanVillage',
+    iconName: 'Recycle',
+    subpages: [
+      { code: 'A', title: { hi: 'मिशन परिचय', en: 'Mission Introduction' }, summary: { hi: 'स्वच्छ परिसर और प्लास्टिक-मुक्त स्थानीय बाजारों का निर्माण।', en: 'Building zero-litter villages and plastic-free local marketplaces.' } },
+      { code: 'B', title: { hi: 'प्लास्टिक-मुक्त अभियान', en: 'Plastic-Free Campaign' }, summary: { hi: 'सिंगल-यूज प्लास्टिक थैलियों के विरुद्ध जागरूकता एवं विकल्प।', en: 'Replacing single-use carry bags through local merchant outreach.' } },
+      { code: 'C', title: { hi: 'कपड़े के थैले पहल', en: 'Cloth Bag Initiative' }, summary: { hi: 'ग्रामीण महिला SHG द्वारा निर्मित टिकाऊ कॉटन बैग व कॉर्पोरेट खरीद संपर्क।', en: 'Reusable cotton bags crafted by women SHGs with bulk B2B/CSR inquiry support.' } },
+      { code: 'D', title: { hi: 'कचरा पृथक्करण', en: 'Waste Segregation' }, summary: { hi: 'गीला, सूखा और खतरनाक कचरा अलग करने की व्यावहारिक कार्यशालाएँ।', en: 'Household and campus training on source segregation.' } },
+      { code: 'E', title: { hi: 'पुनर्चक्रण जागरूकता', en: 'Recycling Awareness' }, summary: { hi: 'प्लास्टिक, कागज और ई-कचरे के जिम्मेदार निपटान की जानकारी।', en: 'Responsible recycling channels for paper, plastic, and packaging.' } },
+      { code: 'F', title: { hi: 'मंदिर अपशिष्ट प्रबंधन', en: 'Temple Waste Management' }, summary: { hi: 'पूजन सामग्री और पुष्पों से जैविक खाद व अगरबत्ती निर्माण।', en: 'Converting floral temple offerings into organic compost.' } },
+      { code: 'G', title: { hi: 'स्वच्छ ग्राम अभियान', en: 'Clean Village Campaign' }, summary: { hi: 'ग्राम पंचायत और युवाओं के सहयोग से सामुदायिक स्वच्छता।', en: 'Village cleanliness drives paired with rural drainage awareness.' } },
+      { code: 'H', title: { hi: 'स्वच्छ शहर अभियान', en: 'Clean City Campaign' }, summary: { hi: 'शहरी वार्डों, विद्यालयों और व्यापारिक संघों के साथ सहभागिता।', en: 'Urban ward partnerships with schools and market associations.' } },
+      { code: 'I', title: { hi: 'स्वयंसेवक पंजीकरण', en: 'Volunteer Registration' }, summary: { hi: 'स्वच्छता व जागरूकता कार्यक्रमों के लिए स्थानीय स्वयंसेवक जुड़ें।', en: 'Join weekend community cleanups and awareness sessions.' } },
+      { code: 'J', title: { hi: 'संस्थागत सहभागिता', en: 'Institutional Participation' }, summary: { hi: 'विद्यालय, व्यापारिक प्रतिष्ठान, पंचायत व नगर निकाय हेतु आवेदन।', en: 'Apply as a school, panchayat, business, or municipal partner.' } },
+    ],
+  },
+  {
+    id: 'skill-development',
+    number: 7,
+    slug: 'skill-development',
+    title: {
+      hi: 'कौशल विकास और रोजगार',
+      en: 'Skill Development & Employment',
+    },
+    shortTitle: {
+      hi: 'कौशल विकास और रोजगार',
+      en: 'Skill Development & Employment',
+    },
+    tagline: {
+      hi: 'विदेशी भाषा प्रशिक्षण, डिजिटल साक्षरता, ग्रामीण उद्यमिता एवं कार्यस्थल सुरक्षा',
+      en: 'Language Training, Digital Literacy, Rural Entrepreneurship & Workplace Safety',
+    },
+    description: {
+      hi: 'ग्रामीण एवं शहरी युवाओं को जर्मन/अंग्रेजी भाषा, कंप्यूटर कौशल, ग्रामीण उद्यमिता (नर्सरी, खाद, सिलाई), प्राथमिक उपचार और रोजगार मार्गदर्शन से जोड़ना।',
+      en: 'Equipping rural and urban youth with German & English communication, digital skills, rural enterprise training, and career readiness.',
+    },
+    imageKey: 'youthSkillLab',
+    iconName: 'GraduationCap',
+    treePosition: { x: 87, y: 31, side: 'right' },
+    disclaimer: {
+      hi: 'पारदर्शिता सूचना: कौशल एवं भाषा प्रशिक्षण केवल योग्यता और तैयारी को सुदृढ़ करने के लिए है; विदेश में नौकरी, वीज़ा अथवा विश्वविद्यालय प्रवेश की कोई गारंटी नहीं दी जाती है।',
+      en: 'Transparency Note: Training courses strengthen skills and exam readiness; GOVEDA does not guarantee overseas employment, visas, or university admissions.',
+    },
+    courses: [
+      {
+        name: { hi: 'जर्मन भाषा फाउंडेशन (A1 / A2 मार्गदर्शन)', en: 'German Language Foundation (A1 / A2 Guidance)' },
+        eligibility: { hi: '12वीं उत्तीर्ण / स्नातक / नर्सिंग एवं तकनीकी छात्र', en: '12th Pass / Graduates / Nursing & Technical Youth' },
+        duration: { hi: '12 सप्ताह (सप्ताह में 5 दिन)', en: '12 Weeks (5 days/week)' },
+        mode: { hi: 'हाइब्रिड (ऑनलाइन + जिला केंद्र)', en: 'Hybrid (Online + District Center)' },
+        trainer: { hi: 'प्रमाणित भाषा प्रशिक्षक पैनल', en: 'Certified Language Faculty Panel' },
+        feeStatus: { hi: 'प्रस्तावित / रियायती छात्रवृत्ति मॉडल', en: 'Proposed / Subsidised Scholarship Track' },
+        description: { hi: 'जर्मन व्याकरण, संवाद कौशल और अंतरराष्ट्रीय परीक्षा तैयारी हेतु बुनियादी पाठ्यक्रम।', en: 'Structured foundation in German grammar, spoken fluency, and exam preparation.' },
+      },
+      {
+        name: { hi: 'अंग्रेजी संवाद एवं साक्षात्कार तैयारी', en: 'English Communication & Interview Readiness' },
+        eligibility: { hi: '10वीं उत्तीर्ण एवं कॉलेज विद्यार्थी', en: '10th Pass & College Students' },
+        duration: { hi: '8 सप्ताह', en: '8 Weeks' },
+        mode: { hi: 'ऑफलाइन कार्यशाला / ऑनलाइन', en: 'Offline Workshop / Online' },
+        trainer: { hi: 'सॉफ्ट-स्किल मेंटर', en: 'Soft-Skills Mentors' },
+        feeStatus: { hi: 'निःशुल्क (पात्र ग्रामीण बैच)', en: 'Free (Eligible Rural Batches)' },
+        description: { hi: 'दैनिक अंग्रेजी संवाद, रिज्यूमे लेखन और आत्मविश्वास निर्माण।', en: 'Everyday spoken English, resume preparation, and mock interviews.' },
+      },
+      {
+        name: { hi: 'कंप्यूटर, डिजिटल कौशल एवं ई-गवर्नेंस', en: 'Computer, Digital Skills & E-Governance' },
+        eligibility: { hi: 'ग्रामीण युवा एवं महिला स्वयं सहायता समूह', en: 'Rural Youth & Women SHG Members' },
+        duration: { hi: '6 सप्ताह', en: '6 Weeks' },
+        mode: { hi: 'जिला प्रशिक्षण केंद्र', en: 'District Training Centre' },
+        trainer: { hi: 'आईटी प्रशिक्षक', en: 'IT & Digital Literacy Trainers' },
+        feeStatus: { hi: 'निःशुल्क / सामुदायिक सहयोग', en: 'Free / Community Supported' },
+        description: { hi: 'बेसिक कंप्यूटर, स्प्रेडशीट, डिजिटल भुगतान सुरक्षा और ऑनलाइन आवेदन प्रक्रिया।', en: 'Office productivity, spreadsheets, safe digital payments, and online portals.' },
+      },
+      {
+        name: { hi: 'ग्रामीण कृषि एवं हरित उद्यमिता', en: 'Rural Agro & Green Entrepreneurship' },
+        eligibility: { hi: 'किसान, युवा एवं महिला समूह', en: 'Farmers, Youth & SHG Members' },
+        duration: { hi: '4 सप्ताह', en: '4 Weeks' },
+        mode: { hi: 'व्यावहारिक क्षेत्र प्रशिक्षण', en: 'Hands-on Field Training' },
+        trainer: { hi: 'कृषि एवं उद्यमिता विशेषज्ञ', en: 'Agri-Business & Nursery Specialists' },
+        feeStatus: { hi: 'निःशुल्क जागरूकता बैच', en: 'Free Community Batch' },
+        description: { hi: 'पौध नर्सरी प्रबंधन, वर्मीकम्पोस्ट इकाई, कपड़े के थैले उत्पादन और स्थानीय विपणन।', en: 'Sapling nursery setup, vermicompost production, cloth-bag enterprise, and local marketing.' },
+      },
+    ],
+    subpages: [
+      { code: 'A', title: { hi: 'मिशन परिचय', en: 'Mission Introduction' }, summary: { hi: 'शिक्षा, व्यावहारिक कौशल और सम्मानजनक आजीविका के बीच सेतु।', en: 'Bridging education, vocational fluency, and dignified local livelihoods.' } },
+      { code: 'B', title: { hi: 'विदेशी भाषा प्रशिक्षण', en: 'Foreign Language Training' }, summary: { hi: 'वैश्विक अवसरों के लिए भाषा दक्षता एवं सांस्कृतिक तैयारी।', en: 'Language literacy and cultural orientation without placement guarantees.' } },
+      { code: 'C', title: { hi: 'जर्मन भाषा पाठ्यक्रम', en: 'German Language' }, summary: { hi: 'A1-B1 स्तर की प्रारंभिक भाषा शिक्षा एवं परीक्षा मार्गदर्शन।', en: 'Structured A1–B1 foundational curriculum and exam preparation.' } },
+      { code: 'D', title: { hi: 'अंग्रेजी एवं संवाद कौशल', en: 'English & Communication' }, summary: { hi: 'प्रभावी संप्रेषण और साक्षात्कार आत्मविश्वास।', en: 'Practical workplace English and interview confidence.' } },
+      { code: 'E', title: { hi: 'कंप्यूटर एवं डिजिटल कौशल', en: 'Computer & Digital Skills' }, summary: { hi: 'ऑफिस टूल्स, इंटरनेट सुरक्षा और डिजिटल साक्षरता।', en: 'Practical computing, documentation, and digital citizen literacy.' } },
+      { code: 'F', title: { hi: 'ग्रामीण उद्यमिता', en: 'Rural Entrepreneurship' }, summary: { hi: 'नर्सरी, जैविक खाद, थैला निर्माण और सूक्ष्म कृषि व्यवसाय।', en: 'Micro-enterprise models for nurseries, compost, and eco-packaging.' } },
+      { code: 'G', title: { hi: 'महिला कौशल प्रशिक्षण', en: 'Women Skill Training' }, summary: { hi: 'सिलाई, पैकेजिंग, वित्तीय साक्षरता और स्थानीय शिल्प।', en: 'Tailoring, quality control, bookkeeping, and artisan marketing.' } },
+      { code: 'H', title: { hi: 'कार्यस्थल सुरक्षा', en: 'Workplace Safety' }, summary: { hi: 'औद्योगिक एवं निर्माण कार्यस्थलों के लिए सुरक्षा मानक।', en: 'Occupational safety orientation for industrial and field roles.' } },
+      { code: 'I', title: { hi: 'प्राथमिक उपचार एवं ड्राइवर प्रशिक्षण', en: 'First Aid & Driver Training' }, summary: { hi: 'आपातकालीन प्राथमिक चिकित्सा व सुरक्षित वाहन संचालन।', en: 'Essential first-aid response and defensive driving discipline.' } },
+      { code: 'J', title: { hi: 'प्रशिक्षण पंजीकरण', en: 'Training Registration' }, summary: { hi: 'आगामी प्रस्तावित बैचों में रुचि दर्ज करने हेतु आवेदन।', en: 'Register interest for upcoming training cohorts.' } },
+      { code: 'K', title: { hi: 'रोजगार मार्गदर्शन', en: 'Employment Guidance' }, summary: { hi: 'करियर परामर्श, रिज्यूमे सहायता और स्थानीय रोजगार संपर्क।', en: 'Career counselling and local employment linkages.' } },
+    ],
+  },
+  {
+    id: 'women-empowerment',
+    number: 8,
+    slug: 'women-empowerment',
+    title: {
+      hi: 'महिला सशक्तीकरण एवं आजीविका',
+      en: 'Women Empowerment',
+    },
+    shortTitle: {
+      hi: 'महिला सशक्तीकरण',
+      en: 'Women Empowerment',
+    },
+    tagline: {
+      hi: 'स्वयं सहायता समूह, कपड़े के थैले उत्पादन, स्वास्थ्य जागरूकता और वित्तीय साक्षरता',
+      en: 'Women Entrepreneurship, Self-Help Groups, Health Literacy & Leadership',
+    },
+    description: {
+      hi: 'महिला स्वयं सहायता समूहों को प्रशिक्षण, सूक्ष्म उद्यमिता, डिजिटल भुगतान, मासिक धर्म स्वास्थ्य जागरूकता (विशेषज्ञ द्वारा जाँची सामग्री) और नेतृत्व से जोड़ना।',
+      en: 'Supporting Women SHGs with cloth-bag production, financial & digital literacy, leadership, and doctor-reviewed health awareness.',
+    },
+    imageKey: 'womenSkill',
+    iconName: 'Users',
+    disclaimer: {
+      hi: 'गोपनीयता एवं स्वास्थ्य सूचना: स्वास्थ्य जागरूकता सामग्री योग्य चिकित्सा विशेषज्ञों की समीक्षा के साथ तैयार की जाती है; किसी भी महिला की व्यक्तिगत स्वास्थ्य जानकारी सार्वजनिक वेबसाइट पर प्रदर्शित नहीं की जाती।',
+      en: 'Privacy & Medical Notice: Health education materials are reviewed with qualified medical advisors; personal health information is never publicly displayed.',
+    },
+    subpages: [
+      { code: 'A', title: { hi: 'मिशन परिचय', en: 'Mission Introduction' }, summary: { hi: 'ग्रामीण महिलाओं की आर्थिक आत्मनिर्भरता एवं गरिमामय सहभागिता।', en: 'Strengthening women-led rural livelihoods and community leadership.' } },
+      { code: 'B', title: { hi: 'महिला उद्यमिता', en: 'Women Entrepreneurship' }, summary: { hi: 'हस्तशिल्प, पैकेजिंग, ब्रांडिंग और स्थानीय बाजार संपर्क।', en: 'Branding, quality control, and direct market access for women-led goods.' } },
+      { code: 'C', title: { hi: 'स्वयं सहायता समूह (SHG)', en: 'Self-Help Groups' }, summary: { hi: 'नए व मौजूदा महिला समूहों का संगठन व क्षमता वर्धन।', en: 'Organising and strengthening rural SHG collectives.' } },
+      { code: 'D', title: { hi: 'कपड़े के थैले उत्पादन', en: 'Cloth Bag Production' }, summary: { hi: 'प्लास्टिक-मुक्त अभियान के साथ सिलाई एवं कॉर्पोरेट ऑर्डर।', en: 'Tailoring durable cotton bags for institutions and retail partners.' } },
+      { code: 'E', title: { hi: 'स्वास्थ्य जागरूकता', en: 'Health Awareness' }, summary: { hi: 'एनीमिया जागरूकता, पोषण और आवश्यकतानुसार चिकित्सक परामर्श संपर्क।', en: 'Anemia awareness, nutrition guidance, and doctor consultation linkages.' } },
+      { code: 'F', title: { hi: 'मासिक धर्म स्वास्थ्य एवं स्वच्छता', en: 'Menstrual Hygiene' }, summary: { hi: 'किशोरी एवं महिला स्वच्छता व सुरक्षित उत्पादों पर संवेदनशील शिक्षा।', en: 'Accessible menstrual hygiene education and safe product awareness.' } },
+      { code: 'G', title: { hi: 'वित्तीय साक्षरता', en: 'Financial Literacy' }, summary: { hi: 'बचत, बैंकिंग, खाता प्रबंधन और सरकारी योजनाओं की समझ।', en: 'Household budgeting, SHG bookkeeping, and banking literacy.' } },
+      { code: 'H', title: { hi: 'डिजिटल कौशल', en: 'Digital Skills' }, summary: { hi: 'सुरक्षित UPI, ऑनलाइन ऑर्डर प्रबंधन और डिजिटल संवाद।', en: 'Safe digital payments and smartphone literacy for women entrepreneurs.' } },
+      { code: 'I', title: { hi: 'महिला नेतृत्व', en: 'Women Leadership' }, summary: { hi: 'ग्राम सभा और पर्यावरण अभियानों में महिला नेतृत्व को प्रोत्साहन।', en: 'Encouraging women leaders across village green committees.' } },
+      { code: 'J', title: { hi: 'पंजीकरण एवं सहायता', en: 'Registration & Support' }, summary: { hi: 'महिला SHG पंजीकरण और प्रशिक्षण अनुरोध।', en: 'Register a Women Self-Help Group or request a community session.' } },
+    ],
+  },
+  {
+    id: 'senior-citizen-care',
+    number: 9,
+    slug: 'senior-citizen-care',
+    title: {
+      hi: 'वृद्धाश्रम एवं मानसिक स्वास्थ्य',
+      en: 'Senior Citizen Care & Mental Well-being',
+    },
+    shortTitle: {
+      hi: 'वृद्धाश्रम एवं मानसिक स्वास्थ्य',
+      en: 'Senior Care & Mental Health',
+    },
+    tagline: {
+      hi: 'वरिष्ठ नागरिकों के सम्मान, सामुदायिक सहयोग, योग व मानसिक स्वास्थ्य की संवेदनशील पहल',
+      en: 'Dignity in Ageing, Community Support, Yoga & Mental Well-being',
+    },
+    description: {
+      hi: 'वृद्धजन देखभाल, प्रस्तावित वृद्धाश्रम मॉडल, योग-ध्यान, सामुदायिक संवाद और मानसिक स्वास्थ्य जागरूकता कार्यक्रम।',
+      en: 'Dedicated to elderly dignity, proposed Vriddha Ashram care standards, yoga & meditation, community companionship, and mental well-being.',
+    },
+    imageKey: 'seniorWellness',
+    iconName: 'HeartHandshake',
+    treePosition: { x: 90, y: 50, side: 'right' },
+    subpages: [
+      { code: 'A', title: { hi: 'मिशन परिचय', en: 'Mission Introduction' }, summary: { hi: 'वरिष्ठ नागरिकों के प्रति सम्मान, संवेदनशीलता और सामाजिक जुड़ाव।', en: 'Fostering dignity, emotional care, and community connection for seniors.' } },
+      { code: 'B', title: { hi: 'वरिष्ठ नागरिक देखभाल', en: 'Senior Citizen Care' }, summary: { hi: 'स्वास्थ्य जांच शिविर, पोषण और दैनिक सहयोग पहल।', en: 'Regular health check-up awareness and community care circles.' } },
+      { code: 'C', title: { hi: 'प्रस्तावित वृद्धाश्रम मॉडल', en: 'Proposed Vriddha Ashram Model' }, summary: { hi: 'हरित, शांत और परिवार-सम वातावरण वाले प्रस्तावित सेवा केंद्र की रूपरेखा।', en: 'Concept plan for serene, green, community-integrated senior care centres.' } },
+      { code: 'D', title: { hi: 'योग एवं ध्यान', en: 'Yoga & Meditation' }, summary: { hi: 'दैनिक प्राणायाम, हल्का व्यायाम और मानसिक शांति सत्र।', en: 'Guided morning yoga, pranayama, and mindfulness sessions.' } },
+      { code: 'E', title: { hi: 'सामुदायिक सहयोग', en: 'Community Support' }, summary: { hi: 'युवाओं व वरिष्ठजनों के बीच अंतर-पीढ़ी संवाद कार्यक्रम।', en: 'Inter-generational community visits and shared storytelling.' } },
+      { code: 'F', title: { hi: 'मानसिक स्वास्थ्य जागरूकता', en: 'Health & Mental Awareness' }, summary: { hi: 'अकेलेपन, तनाव और मानसिक स्वास्थ्य पर खुला व संवेदनशील संवाद।', en: 'Destigmatising loneliness and mental wellness conversations in rural & urban families.' } },
+      { code: 'G', title: { hi: 'स्वयंसेवक सहयोग', en: 'Volunteer Support' }, summary: { hi: 'चिकित्सा, योग व सामुदायिक सेवा हेतु स्वयंसेवकों की भागीदारी।', en: 'Volunteer registration for senior wellness camps.' } },
+      { code: 'H', title: { hi: 'संस्थागत सहभागिता', en: 'Institutional Partnership' }, summary: { hi: 'सामाजिक संस्थाओं और अस्पतालों के साथ समन्वय।', en: 'Partnering with healthcare trusts and civic organisations.' } },
+      { code: 'I', title: { hi: 'सहायता पूछताछ', en: 'Support Inquiry' }, summary: { hi: 'वरिष्ठजन सेवा या परामर्श हेतु संपर्क।', en: 'Reach out for senior care collaboration or community support.' } },
+    ],
+  },
+  {
+    id: 'heritage-solar-water',
+    number: 10,
+    slug: 'heritage-solar-water',
+    title: {
+      hi: 'सांस्कृतिक धरोहर (शेखावाटी एवं राजस्थान) व जल-सौर संरक्षण',
+      en: 'Heritage, Solar & Water Conservation',
+    },
+    shortTitle: {
+      hi: 'सांस्कृतिक धरोहर व जल संरक्षण',
+      en: 'Heritage, Solar & Water',
+    },
+    tagline: {
+      hi: 'राजस्थान की पुरानी हवेलियों, कुंडों का संरक्षण, रूफटॉप सोलर और टिकाऊ विरासत मॉडल',
+      en: 'Restoring Historic Havelis & Traditional Kunds with Rooftop Solar & Water Harvesting',
+    },
+    description: {
+      hi: 'शेखावाटी एवं राजस्थान की ऐतिहासिक हवेलियों, धर्मशालाओं व पारंपरिक कुंडों का संरक्षण तथा रूफटॉप सोलर व टेरेस गार्डन द्वारा पर्यावरण-अनुकूल उपयोग।',
+      en: 'Preserving Rajasthan’s sandstone havelis, stepwells (kunds), and dharamshalas while integrating rooftop solar and rainwater harvesting.',
+    },
+    imageKey: 'heritageSolar',
+    iconName: 'Landmark',
+    treePosition: { x: 75, y: 15, side: 'right' },
+    subpages: [
+      { code: 'A', title: { hi: 'मिशन परिचय', en: 'Mission Introduction' }, summary: { hi: 'विरासत संरक्षण और आधुनिक हरित ऊर्जा का समन्वय।', en: 'Blending Rajasthan’s architectural heritage with clean solar and water stewardship.' } },
+      { code: 'B', title: { hi: 'हवेली एवं धरोहर संरक्षण', en: 'Heritage Haveli Restoration' }, summary: { hi: 'शेखावाटी व अन्य क्षेत्रों की ऐतिहासिक हवेलियों के संरक्षण की पहल।', en: 'Sensitive conservation planning for Shekhawati and historic Rajasthan havelis.' } },
+      { code: 'C', title: { hi: 'रूफटॉप सोलर', en: 'Rooftop Solar' }, summary: { hi: 'सामुदायिक भवनों, धर्मशालाओं और हवेलियों पर स्वच्छ सौर ऊर्जा।', en: 'Low-visual-impact solar integration on heritage and community roofs.' } },
+      { code: 'D', title: { hi: 'वर्षा जल संचयन', en: 'Rainwater Harvesting' }, summary: { hi: 'छतों के वर्षा जल को भूमिगत टांकों व कुंडों में सहेजना।', en: 'Rooftop rainwater harvesting routed into traditional storage chambers.' } },
+      { code: 'E', title: { hi: 'पारंपरिक कुंड जीर्णोद्धार', en: 'Traditional Kund Restoration' }, summary: { hi: 'ऐतिहासिक बावड़ियों, कुंडों व जोहड़ों की सफाई एवं पुनर्जीवन।', en: 'Cleaning and structural revival of traditional kunds and stepwells.' } },
+      { code: 'F', title: { hi: 'टेरेस जैविक उद्यान', en: 'Terrace Organic Gardens' }, summary: { hi: 'हवेलियों एवं शहरी छतों पर शीतलता व औषधीय पौधों की बागवानी।', en: 'Cooling rooftop herb and vegetable gardens for historic buildings.' } },
+      { code: 'G', title: { hi: 'टिकाऊ विरासत मॉडल', en: 'Sustainable Heritage Model' }, summary: { hi: 'पर्यटन, संस्कृति और पर्यावरण शिक्षा के जीवंत केंद्र।', en: 'Turning preserved sites into self-sustaining cultural & green learning spaces.' } },
+      { code: 'H', title: { hi: 'भवन स्वामी पंजीकरण', en: 'Property Owner Registration' }, summary: { hi: 'संरक्षण हेतु इच्छुक हवेली/धर्मशाला ट्रस्टों का पंजीकरण।', en: 'Register historic properties or dharamshala trusts for assessment.' } },
+      { code: 'I', title: { hi: 'CSR सहभागिता', en: 'CSR Partnership' }, summary: { hi: 'धरोहर एवं जल संरक्षण परियोजनाओं में कॉर्पोरेट सहयोग।', en: 'CSR funding tracks for water bodies and heritage greening.' } },
+      { code: 'J', title: { hi: 'तकनीकी मूल्यांकन पूछताछ', en: 'Technical Assessment Inquiry' }, summary: { hi: 'सोलर व जल संचयन सर्वेक्षण के लिए अनुरोध।', en: 'Request preliminary solar and water conservation feasibility feedback.' } },
+    ],
+  },
+];
+
+// Explicit 8th tree branch node (matching homepage reference's bottom-right leaf: Water Conservation & Green Village)
+export const TREE_EXTRA_NODE = {
+  id: 'water-green-village',
+  slug: 'harit-rajasthan',
+  title: {
+    hi: 'जल संरक्षण और हरित गाँव',
+    en: 'Water Conservation & Green Village',
+  },
+  imageKey: 'heritageSolar' as const,
+  iconName: 'Droplets',
+  treePosition: { x: 88, y: 67, side: 'right' as const },
+};
